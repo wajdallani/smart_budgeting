@@ -1,0 +1,32 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Cards basic - UI elements{% endblock %}
+
+{% block vendor_js %}
+  {{ block.super }}
+  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+
+<h1>Mes objectifs d'épargne</h1>
+<a href="{% url 'epargne:create' %}">+ Nouvel objectif</a>
+
+<ul>
+  {% for obj in objectifs %}
+    <li>
+      <a href="{% url 'epargne:detail' obj.pk %}">
+        {{ obj.titre }} - {{ obj.montant_actuel }}/{{ obj.montant_cible }} ({{ obj.progression_pourcentage }}%)
+      </a>
+    </li>
+  {% empty %}
+    <li>Aucun objectif pour le moment.</li>
+  {% endfor %}
+</ul>
+
+
+
+{% endblock %}
