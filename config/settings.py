@@ -67,8 +67,15 @@ INSTALLED_APPS = [
     "apps.forms",
     "apps.form_layouts",
     "apps.tables",
+    "apps.categorieApp",
+    "apps.depenseApp",
+    "apps.revenueApp",
     "apps.detteApp",
+    "apps.groupApp",
+    "apps.userApp",
+    "apps.objectifsEpargnesApp",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
