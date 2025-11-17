@@ -25,30 +25,75 @@
               </a>
             </div>
             <!-- /Logo -->
-            <h4 class="mb-1">Welcome to
-              {% get_theme_variables 'template_name' %}! 👋</h4>
+            <h4 class="mb-1">Welcome to {% get_theme_variables 'template_name' %}! 👋</h4>
             <p class="mb-6">Please sign-in to your account and start the adventure</p>
 
-            <form id="formAuthentication" class="mb-6" action="{% url 'index' %}">
+            <!-- Messages -->
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form id="formAuthentication" class="mb-6" method="post">
               {% csrf_token %}
+              
+              <!-- Email -->
               <div class="mb-6">
-                <label for="email" class="form-label">Email or Username</label>
-                <input type="text" class="form-control" id="email" name="email-username" placeholder="Enter your email or username" autofocus="autofocus"/>
+                <label for="id_email" class="form-label">Email</label>
+                <input type="email" 
+                       class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                       id="id_email" 
+                       name="email" 
+                       placeholder="Entrez votre email"
+                       value="{{ form.email.value|default:'' }}"
+                       autofocus
+                       required>
+                {% if form.email.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.email.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
+
+              <!-- Password -->
               <div class="mb-6 form-password-toggle">
-                <label class="form-label" for="password">Password</label>
+                <label class="form-label" for="id_password">Password</label>
                 <div class="input-group input-group-merge">
-                  <input type="password" id="password" class="form-control" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password"/>
+                  <input type="password" 
+                         class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                         id="id_password" 
+                         name="password" 
+                         placeholder="············"
+                         aria-describedby="password"
+                         required>
                   <span class="input-group-text cursor-pointer">
                     <i class="icon-base bx bx-hide"></i>
                   </span>
                 </div>
+                {% if form.password.errors %}
+                  <div class="text-danger mt-1">
+                    {% for error in form.password.errors %}
+                      <small>{{ error }}</small>
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
+
+              <!-- Remember me & Forgot password -->
               <div class="mb-8">
                 <div class="d-flex justify-content-between">
                   <div class="form-check mb-0">
-                    <input class="form-check-input" type="checkbox" id="remember-me"/>
-                    <label class="form-check-label" for="remember-me">
+                    <input class="form-check-input" 
+                           type="checkbox" 
+                           id="id_remember_me" 
+                           name="remember_me">
+                    <label class="form-check-label" for="id_remember_me">
                       Remember Me
                     </label>
                   </div>
@@ -57,6 +102,7 @@
                   </a>
                 </div>
               </div>
+
               <div class="mb-6">
                 <button class="btn btn-primary d-grid w-100" type="submit">Login</button>
               </div>
@@ -74,4 +120,30 @@
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block page_js %}
+  {{ block.super }}
+  <script>
+    // Script pour afficher/masquer le mot de passe
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.form-password-toggle .input-group-text').forEach(function(element) {
+        element.addEventListener('click', function() {
+          const inputGroup = this.closest('.input-group');
+          const input = inputGroup.querySelector('input');
+          const icon = this.querySelector('i');
+          
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bx-hide');
+            icon.classList.add('bx-show');
+          } else {
+            input.type = 'password';
+            icon.classList.remove('bx-show');
+            icon.classList.add('bx-hide');
+          }
+        });
+      });
+    });
+  </script>
 {% endblock %}

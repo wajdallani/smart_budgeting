@@ -1,466 +1,491 @@
+{# vertical_menu.html - Sidebar personnalisé selon le rôle utilisateur #}
+{% load static %}
+
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-  <!-- ! Hide app brand if navbar-full -->
-  {% if not navbar_full %}
+  
+  <!-- Logo & Brand -->
   <div class="app-brand demo">
-    <a href="{% url 'index' %}" class="app-brand-link">
+    <a href="{% url 'admin:index' %}" class="app-brand-link">
       <span class="app-brand-logo demo">
-        {% include 'partials/logo.html'  %}
+        <svg width="25" viewBox="0 0 25 42" version="1.1" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+              <stop stop-color="#696cff" offset="0%"></stop>
+              <stop stop-color="#5f61e6" offset="100%"></stop>
+            </linearGradient>
+          </defs>
+          <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+            <circle fill="url(#linearGradient-1)" cx="12.5" cy="12.5" r="12.5"></circle>
+          </g>
+        </svg>
       </span>
-      <span class="app-brand-text demo menu-text fw-bold ms-2">{% get_theme_variables 'template_name' %}</span>
+      <span class="app-brand-text demo menu-text fw-bolder ms-2">FinanceApp</span>
     </a>
 
     <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
-      <i class="icon-base bx bx-chevron-left icon-sm d-flex align-items-center justify-content-center"></i>
+      <i class="bx bx-chevron-left bx-sm align-middle"></i>
     </a>
   </div>
-  {% endif %}
-
 
   <div class="menu-inner-shadow"></div>
 
+  <!-- Menu Content -->
   <ul class="menu-inner py-1">
-
-    <li class="menu-item {% if 'index' == request.resolver_match.url_name or '/dashbord/' in request.path %}active open{% endif %}">
-      <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class="menu-icon icon-base bx bx-home-smile"></i>
-        <div class="text-truncate">Dashboards</div>
-        <span class="badge bg-danger rounded-pill ms-auto">5</span>
-      </a>
-      <ul class="menu-sub">
-        <li class="menu-item {% if 'index' == request.resolver_match.url_name %}active{% endif %}">
-          <a href="{% url 'index' %}" class="menu-link">
-            <div class="text-truncate">Analytics</div>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="{% get_theme_variables 'live_preview' %}dashboard/crm/" class="menu-link" target="_blank">
-            <div class="text-truncate">CRM</div>
-            <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="{% get_theme_variables 'live_preview' %}app/ecommerce/dashboard/" class="menu-link" target="_blank">
-            <div class="text-truncate">eCommerce</div>
-            <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="{% get_theme_variables 'live_preview' %}app/logistics/dashboard/" class="menu-link" target="_blank">
-            <div class="text-truncate">Logistics</div>
-            <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="{% get_theme_variables 'live_preview' %}app/academy/dashboard/" class="menu-link" target="_blank">
-            <div class="text-truncate">Academy</div>
-            <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
-          </a>
-        </li>
-      </ul>
-    </li>
-    <!-- Layouts -->
-    <li class="menu-item {% if '/layouts/' in request.path  %}active open{% endif %}">
-      <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class="menu-icon icon-base bx bx-layout"></i>
-        <div class="text-truncate">Layouts</div>
-      </a>
-      <ul class="menu-sub">
-        <li class="menu-item {% if '/without_menu/' in request.path %}active{% endif %}">
-          <a href="{% url 'layouts-without-menu' %}" class="menu-link">
-            <div class="text-truncate">Without menu</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/without_navbar/' in request.path %}active{% endif %}">
-          <a href="{% url 'layouts-without-navbar' %}" class="menu-link">
-            <div class="text-truncate">Without navbar</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/fluid/' in request.path %}active{% endif %}">
-          <a href="{% url 'layouts-fluid' %}" class="menu-link">
-            <div class="text-truncate">Fluid</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/container/' in request.path %}active{% endif %}">
-          <a href="{% url 'layouts-container' %}" class="menu-link">
-            <div class="text-truncate">Container</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/blank/' in request.path %}active{% endif %}">
-          <a href="{% url 'layouts-blank' %}" class="menu-link">
-            <div class="text-truncate">Blank</div>
-          </a>
-        </li>
-      </ul>
-    </li>
-    <!-- Front Pages -->
-    <li class="menu-item">
-      <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class='menu-icon icon-base bx bx-store'></i>
-        <div class="text-truncate">Front Pages</div>
-        <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</div>
-      </a>
-      <ul class="menu-sub">
-        <li class="menu-item">
-          <a href="{% get_theme_variables 'live_preview' %}front/landing/" class="menu-link" target="_blank">
-            <div class="text-truncate">Landing</div>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="{% get_theme_variables 'live_preview' %}front/pricing/" class="menu-link" target="_blank">
-            <div class="text-truncate">Pricing</div>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="{% get_theme_variables 'live_preview' %}front/payment/" class="menu-link" target="_blank">
-            <div class="text-truncate">Payment</div>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="{% get_theme_variables 'live_preview' %}front/checkout/" class="menu-link" target="_blank">
-            <div class="text-truncate">Checkout</div>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="{% get_theme_variables 'live_preview' %}front/help_center/" class="menu-link" target="_blank">
-            <div class="text-truncate">Help Center</div>
-          </a>
-        </li>
-      </ul>
-    </li>
-
-    <li class="menu-item">
-      <a href="{% get_theme_variables 'live_preview' %}transactions/list/" class="menu-link" target="_blank">
-        <i class="menu-icon icon-base bx bx-data"></i>
-        <div class="text-truncate">Transactions (CRUD)</div>
-        <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
+    
+    <li class="menu-item {% if request.path == '/admin/' %}active{% endif %}">
+      <a href="{% url 'admin:index' %}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-home-circle"></i>
+        <div data-i18n="Dashboard">Tableau de bord</div>
       </a>
     </li>
 
     <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">Apps & Pages</span>
+      <span class="menu-header-text">Menu Principal</span>
     </li>
-
-    <li class="menu-item">
-      <a href="{% get_theme_variables 'live_preview' %}app/email/" class="menu-link" target="_blank">
-        <i class="menu-icon icon-base bx bx-envelope"></i>
-        <div class="text-truncate">Email</div>
-        <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
-      </a>
-    </li>
-    <li class="menu-item">
-      <a href="{% get_theme_variables 'live_preview' %}app/chat/" class="menu-link" target="_blank">
-        <i class="menu-icon icon-base bx bx-chat"></i>
-        <div class="text-truncate">Chat</div>
-        <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
-      </a>
-    </li>
-    <li class="menu-item">
-      <a href="{% get_theme_variables 'live_preview' %}app/calendar/" class="menu-link" target="_blank">
-        <i class="menu-icon icon-base bx bx-calendar"></i>
-        <div class="text-truncate">Calendar</div>
-        <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
-      </a>
-    </li>
-    <li class="menu-item">
-      <a href="{% get_theme_variables 'live_preview' %}app/kanban/" class="menu-link" target="_blank">
-        <i class="menu-icon icon-base bx bx-grid"></i>
-        <div class="text-truncate">Kanban</div>
-        <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
-      </a>
-    </li>
-    <!-- Account -->
-    <li class="menu-item {% if '/account_settings/' in request.path %}active open{% endif %}">
+    {% if user.is_superuser or user.is_staff %}
+    
+    <li class="menu-item {% if 'user' in request.path %}active open{% endif %}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class="menu-icon icon-base bx bx-dock-top"></i>
-        <div class="text-truncate">Account Settings</div>
+        <i class="menu-icon tf-icons bx bx-group"></i>
+        <div data-i18n="Gestion Utilisateurs">Gérer Utilisateurs</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {% if '/account/' in request.path %}active{% endif %}">
-          <a href="{% url 'pages-account-settings-account' %}" class="menu-link">
-            <div class="text-truncate">Account</div>
+        <li class="menu-item {% if 'user/user/add' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:userApp_user_add' %}" class="menu-link">
+            <i class="bx bx-plus-circle"></i>
+            <div data-i18n="Ajouter utilisateur">Ajouter un utilisateur</div>
           </a>
         </li>
-        <li class="menu-item {% if '/notifications/' in request.path %}active{% endif %}">
-          <a href="{% url 'pages-account-settings-notifications' %}" class="menu-link">
-            <div class="text-truncate">Notifications</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/connections/' in request.path %}active{% endif %}">
-          <a href="{% url 'pages-account-settings-connections' %}" class="menu-link">
-            <div class="text-truncate">Connections</div>
+        <li class="menu-item {% if 'user/user' in request.path and 'add' not in request.path %}active{% endif %}">
+          <a href="{% url 'admin:userApp_user_changelist' %}" class="menu-link">
+            <i class="bx bx-list-ul"></i>
+            <div data-i18n="Liste utilisateurs">Liste des utilisateurs</div>
           </a>
         </li>
       </ul>
     </li>
-    <!-- Auth -->
-    <li class="menu-item {% if '/auth/' in request.path %}active open{% endif %}">
+    <li class="menu-item {% if 'auth/group' in request.path %}active open{% endif %}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class="menu-icon icon-base bx bx-lock-open-alt"></i>
-        <div class="text-truncate">Authentications</div>
+        <i class="menu-icon tf-icons bx bx-shield"></i>
+        <div data-i18n="Gestion Groupes">Gérer Groupes</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {% if '/login/' in request.path %}active{% endif %}">
-          <a href="{% url 'auth-login-basic' %}" class="menu-link" target="_blank">
-            <div class="text-truncate">Login</div>
+        <li class="menu-item {% if 'auth/group/add' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:auth_group_add' %}" class="menu-link">
+            <i class="bx bx-plus-circle"></i>
+            <div data-i18n="Ajouter groupe">Ajouter un groupe</div>
           </a>
         </li>
-        <li class="menu-item {% if '/register/' in request.path %}active{% endif %}">
-          <a href="{% url 'auth-register-basic' %}" class="menu-link" target="_blank">
-            <div class="text-truncate">Register</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/forgot_password/' in request.path %}active{% endif %}">
-          <a href="{% url 'auth-forgot-password-basic' %}" class="menu-link" target="_blank">
-            <div class="text-truncate">Forgot Password</div>
+        <li class="menu-item {% if 'auth/group' in request.path and 'add' not in request.path %}active{% endif %}">
+          <a href="{% url 'admin:auth_group_changelist' %}" class="menu-link">
+            <i class="bx bx-list-ul"></i>
+            <div data-i18n="Liste groupes">Liste des groupes</div>
           </a>
         </li>
       </ul>
     </li>
-    <!-- Misc -->
-    <li class="menu-item {% if '/misc/' in request.path %}active open{% endif %}">
+
+    <li class="menu-item {% if 'category' in request.path %}active open{% endif %}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class="menu-icon icon-base bx bx-cube-alt"></i>
-        <div class="text-truncate">Misc</div>
+        <i class="menu-icon tf-icons bx bx-category"></i>
+        <div data-i18n="Gestion Catégories">Gérer Catégories</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {% if '/error/' in request.path %}active{% endif %}">
-          <a href="{% url 'pages-misc-error' %}" class="menu-link" target="_blank">
-            <div class="text-truncate">Error</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-plus-circle"></i>
+            <div data-i18n="Ajouter catégorie">Ajouter une catégorie</div>
           </a>
         </li>
-        <li class="menu-item {% if '/under_maintenance/' in request.path %}active{% endif %}">
-          <a href="{% url 'pages-misc-under-maintenance' %}" class="menu-link" target="_blank">
-            <div class="text-truncate">Under Maintenance</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-list-ul"></i>
+            <div data-i18n="Liste catégories">Liste des catégories</div>
           </a>
         </li>
       </ul>
     </li>
 
-    <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">Components</span>
-    </li>
-
-    <li class="menu-item {% if '/cards/basic/' in request.path %}active{% endif %}">
-      <a href="{% url 'cards-basic' %}" class="menu-link">
-        <i class="menu-icon icon-base bx bx-collection"></i>
-        <div class="text-truncate">Cards</div>
-      </a>
-    </li>
-    <!-- UI -->
-    <li class="menu-item {% if '/ui/' in request.path %}active open{% endif %}">
-      <a href=" javascript:void(0)" class="menu-link menu-toggle">
-        <i class="menu-icon icon-base bx bx-box"></i>
-        <div class="text-truncate">User interface</div>
-      </a>
-      <ul class="menu-sub">
-        <li class="menu-item {% if '/accordion/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-accordion' %}" class="menu-link">
-            <div class="text-truncate">Accordion</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/alerts/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-alerts' %}" class="menu-link">
-            <div class="text-truncate">Alerts</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/badges/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-badges' %}" class="menu-link">
-            <div class="text-truncate">Badges</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/buttons/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-buttons' %}" class="menu-link">
-            <div class="text-truncate">Buttons</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/carousel/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-carousel' %}" class="menu-link">
-            <div class="text-truncate">Carousel</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/collapse/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-collapse' %}" class="menu-link">
-            <div class="text-truncate">Collapse</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/dropdowns/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-dropdowns' %}" class="menu-link">
-            <div class="text-truncate">Dropdowns</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/footer/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-footer' %}" class="menu-link">
-            <div class="text-truncate">Footer</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/list_groups/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-list-groups' %}" class="menu-link">
-            <div class="text-truncate">List groups</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/modals/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-modals' %}" class="menu-link">
-            <div class="text-truncate">Modals</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/navbar/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-navbar' %}" class="menu-link">
-            <div class="text-truncate">Navbar</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/offcanvas/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-offcanvas' %}" class="menu-link">
-            <div class="text-truncate">Offcanvas</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/pagination_breadcrumbs/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-pagination-breadcrumbs' %}" class="menu-link">
-            <div class="text-truncate">Pagination &amp; Breadcrumbs</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/progress/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-progress' %}" class="menu-link">
-            <div class="text-truncate">Progress</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/spinners/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-spinners' %}" class="menu-link">
-            <div class="text-truncate">Spinners</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/tabs_pills/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-tabs-pills' %}" class="menu-link">
-            <div class="text-truncate">Tabs &amp; Pills</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/toasts/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-toasts' %}" class="menu-link">
-            <div class="text-truncate">Toasts</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/tooltips_popovers/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-tooltips-popovers' %}" class="menu-link">
-            <div class="text-truncate">Tooltips &amp; Popovers</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/typography/' in request.path %}active{% endif %}">
-          <a href="{% url 'ui-typography' %}" class="menu-link">
-            <div class="text-truncate">Typography</div>
-          </a>
-        </li>
       </ul>
     </li>
-    <!-- Extended UI -->
-    <li class="menu-item {% if '/extended_ui/' in request.path %}active open{% endif %}">
-      <a href="javascript:void(0)" class="menu-link menu-toggle">
-        <i class="menu-icon icon-base bx bx-copy"></i>
-        <div class="text-truncate">Extended UI</div>
+
+    {% else %}
+    
+    <li class="menu-item {% if 'depense' in request.path %}active open{% endif %}">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-wallet"></i>
+        <div data-i18n="Gestion Dépenses">Gérer Dépenses</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {% if '/perfect_scrollbar/' in request.path %}active{% endif %}">
-          <a href="{% url 'extended-ui-perfect-scrollbar' %}" class="menu-link">
-            <div class="text-truncate">Perfect Scrollbar</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-plus-circle"></i>
+            <div data-i18n="Ajouter dépense">Ajouter une dépense</div>
           </a>
         </li>
-        <li class="menu-item {% if '/text_divider/' in request.path %}active{% endif %}">
-          <a href="{% url 'extended-ui-text-divider' %}" class="menu-link">
-            <div class="text-truncate">Text Divider</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-list-ul"></i>
+            <div data-i18n="Liste dépenses">Liste des dépenses</div>
           </a>
         </li>
-      </ul>
-    </li>
-    <!-- Icons -->
-    <li class="menu-item {% if '/boxicons/' in request.path %}active{% endif %}">
-      <a href="{% url 'icons-boxicons' %}" class="menu-link">
-        <i class="menu-icon icon-base bx bx-crown"></i>
-        <div class="text-truncate">Boxicons</div>
-      </a>
-    </li>
-
-    <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">Forms & Tables</span>
-    </li>
-
-    <!-- Form -->
-    <li class="menu-item {% if '/forms/' in request.path %}active open{% endif %}">
-      <a href="javascript:void(0)" class="menu-link menu-toggle">
-        <i class="menu-icon icon-base bx bx-detail"></i>
-        <div class="text-truncate">Form Elements</div>
-      </a>
-      <ul class="menu-sub">
-        <li class="menu-item {% if '/basic_inputs/' in request.path %}active{% endif %}">
-          <a href="{% url 'forms-basic-inputs' %}" class="menu-link">
-            <div class="text-truncate">Basic Inputs</div>
-          </a>
-        </li>
-        <li class="menu-item {% if '/input_groups/' in request.path %}active{% endif %}">
-          <a href="{% url 'forms-input-groups' %}" class="menu-link">
-            <div class="text-truncate">Input groups</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-search"></i>
+            <div data-i18n="Rechercher dépense">Rechercher une dépense</div>
           </a>
         </li>
       </ul>
     </li>
 
-    <!-- Form Layouts -->
-    <li class="menu-item {% if '/form/' in request.path %}active open{% endif %}">
-      <a href="javascript:void(0)" class="menu-link menu-toggle">
-        <i class="menu-icon icon-base bx bx-detail"></i>
-        <div class="text-truncate">Form Layouts</div>
+    <li class="menu-item {% if 'category' in request.path %}active open{% endif %}">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-category"></i>
+        <div data-i18n="Gestion Catégories">Gérer Catégories</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {% if '/layouts_vertical/' in request.path %}active{% endif %}">
-          <a href="{% url 'form-layouts-vertical' %}" class="menu-link">
-            <div class="text-truncate">Vertical Form</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-plus-circle"></i>
+            <div data-i18n="Ajouter catégorie">Ajouter une catégorie</div>
           </a>
         </li>
-        <li class="menu-item {% if '/layouts_horizontal/' in request.path %}active{% endif %}">
-          <a href="{% url 'form-layouts-horizontal' %}" class="menu-link">
-            <div class="text-truncate">Horizontal Form</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-list-ul"></i>
+            <div data-i18n="Mes catégories">Mes catégories</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+
+    <li class="menu-item {% if 'dette' in request.path %}active open{% endif %}">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-money"></i>
+        <div data-i18n="Gestion Dettes">Gérer Dettes</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-plus-circle"></i>
+            <div data-i18n="Ajouter dette">Ajouter une dette</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-list-ul"></i>
+            <div data-i18n="Liste dettes">Liste des dettes</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-dollar-circle"></i>
+            <div data-i18n="Dettes en cours">Dettes en cours</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-check-circle"></i>
+            <div data-i18n="Dettes remboursées">Dettes remboursées</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="menu-item {% if 'budget' in request.path %}active open{% endif %}">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-calculator"></i>
+        <div data-i18n="Gestion Budget">Gérer Budget</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-plus-circle"></i>
+            <div data-i18n="Définir budget">Définir un budget</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-list-ul"></i>
+            <div data-i18n="Mes budgets">Mes budgets</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-pie-chart-alt-2"></i>
+            <div data-i18n="Suivi budget">Suivi du budget</div>
           </a>
         </li>
       </ul>
     </li>
 
     <li class="menu-item">
-      <a href="{% get_theme_variables 'live_preview' %}form/validation/" class="menu-link" target="_blank">
-        <i class="menu-icon icon-base bx bx-list-check"></i>
-        <div class="text-truncate">Form Validation</div>
-        <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-line-chart"></i>
+        <div data-i18n="Mes Statistiques">Mes Statistiques</div>
       </a>
+      <ul class="menu-sub">
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-trending-up"></i>
+            <div data-i18n="Vue mensuelle">Vue mensuelle</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-calendar"></i>
+            <div data-i18n="Vue annuelle">Vue annuelle</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="bx bx-pie-chart-alt"></i>
+            <div data-i18n="Par catégorie">Dépenses par catégorie</div>
+          </a>
+        </li>
+      </ul>
     </li>
 
-    <li class="menu-item {% if '/tables/basic/' in request.path %}active{% endif %}">
-      <a href="{% url 'tables-basic' %}" class="menu-link">
-        <i class="menu-icon icon-base bx bx-table"></i>
-        <div class="text-truncate">Tables</div>
-      </a>
-    </li>
-    <li class="menu-item">
-      <a href="{% get_theme_variables 'live_preview' %}tables/datatables_basic/" class="menu-link" target="_blank">
-        <i class="menu-icon icon-base bx bx-grid"></i>
-        <div class="text-truncate">Datatables</div>
-        <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
-      </a>
-    </li>
-
-    <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">Misc</span>
-    </li>
-
-    <li class="menu-item">
-      <a href="https://themeselection.com/support/" class="menu-link" target="_blank">
-        <i class="menu-icon icon-base bx bx-support"></i>
-        <div class="text-truncate">Support</div>
-      </a>
-    </li>
-    <li class="menu-item">
-      <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/documentation/django-introduction.html" class="menu-link" target="_blank">
-        <i class="menu-icon icon-base bx bx-file"></i>
-        <div class="text-truncate">Documentation</div>
-      </a>
-    </li>
+    {% endif %}
 
   </ul>
 
-
 </aside>
+
+<style>
+
+/* Menu général */
+.menu-inner {
+    padding: 0.5rem 0;
+}
+
+/* Séparateurs de sections */
+.menu-header {
+    padding: 1.25rem 1.5rem 0.625rem;
+    margin-top: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.menu-header:first-child {
+    margin-top: 0;
+}
+
+.menu-header-text {
+    color: #a1acb8;
+    font-size: 0.75rem;
+}
+
+/* Items de menu */
+.menu-item {
+    margin-bottom: 0.25rem;
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: #697a8d;
+    transition: all 0.2s ease;
+    border-radius: 0.375rem;
+    margin: 0 0.75rem;
+}
+
+.menu-link:hover {
+    background: rgba(105, 108, 255, 0.08);
+    color: #696cff;
+}
+
+/* Menu icon */
+.menu-icon {
+    margin-right: 0.75rem;
+    font-size: 1.375rem;
+    flex-shrink: 0;
+}
+
+/* Items actifs */
+.menu-item.active > .menu-link {
+    background: linear-gradient(135deg, rgba(105, 108, 255, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    box-shadow: inset 4px 0 0 #696cff;
+    color: #696cff;
+    font-weight: 600;
+}
+
+.menu-item.active > .menu-link .menu-icon {
+    color: #696cff;
+}
+
+/* Sous-menus */
+.menu-sub {
+    padding-left: 0;
+    margin-top: 0.25rem;
+}
+
+.menu-sub .menu-item {
+    margin-bottom: 0;
+}
+
+.menu-sub .menu-link {
+    padding: 0.625rem 1.5rem 0.625rem 3.5rem;
+    font-size: 0.9375rem;
+}
+
+.menu-sub .menu-link i {
+    margin-right: 0.625rem;
+    font-size: 1.125rem;
+    opacity: 0.7;
+}
+
+.menu-sub .menu-link:hover i {
+    opacity: 1;
+}
+
+/* Menu ouvert */
+.menu-item.open > .menu-link {
+    background: rgba(105, 108, 255, 0.06);
+}
+
+/* Badge de notification */
+.badge {
+    min-width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Bouton déconnexion */
+.menu-link.text-danger {
+    color: #ff4c51 !important;
+}
+
+.menu-link.text-danger:hover {
+    background: rgba(255, 76, 81, 0.08);
+}
+
+/* Responsive */
+@media (max-width: 1199.98px) {
+    .layout-menu {
+        transform: translateX(-100%);
+    }
+    
+    .layout-menu.show {
+        transform: translateX(0);
+    }
+}
+
+/* Animation d'ouverture des sous-menus */
+.menu-sub {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.menu-item.open > .menu-sub {
+    max-height: 1000px;
+}
+
+/* Icône de toggle */
+.menu-toggle::after {
+    content: '';
+    position: absolute;
+    right: 1.5rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.2s;
+}
+
+.menu-item.open > .menu-toggle::after {
+    transform: rotate(-135deg);
+}
+
+/* Amélioration du logo */
+.app-brand {
+    padding: 1.5rem 1.5rem 1.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.app-brand-logo {
+    margin-right: 0.5rem;
+}
+
+.app-brand-text {
+    font-size: 1.375rem;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Shadow interne */
+.menu-inner-shadow {
+    display: none;
+}
+
+/* Scrollbar personnalisée */
+.layout-menu {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(105, 108, 255, 0.3) transparent;
+}
+
+.layout-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.layout-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.layout-menu::-webkit-scrollbar-thumb {
+    background: rgba(105, 108, 255, 0.3);
+    border-radius: 10px;
+}
+
+.layout-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(105, 108, 255, 0.5);
+}
+</style>
+
+<script>
+// Script pour gérer l'ouverture/fermeture des sous-menus
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggles = document.querySelectorAll('.menu-toggle');
+    
+    menuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            const menuItem = this.closest('.menu-item');
+            
+            // Fermer les autres menus ouverts au même niveau
+            const siblings = menuItem.parentElement.querySelectorAll(':scope > .menu-item.open');
+            siblings.forEach(sibling => {
+                if (sibling !== menuItem) {
+                    sibling.classList.remove('open');
+                }
+            });
+            
+            // Toggle le menu actuel
+            menuItem.classList.toggle('open');
+        });
+    });
+    
+    // Garder ouvert le menu actif au chargement
+    const activeItem = document.querySelector('.menu-item.active');
+    if (activeItem) {
+        let parent = activeItem.closest('.menu-item.menu-toggle');
+        while (parent) {
+            parent.classList.add('open');
+            parent = parent.parentElement.closest('.menu-item.menu-toggle');
+        }
+    }
+});
+</script>

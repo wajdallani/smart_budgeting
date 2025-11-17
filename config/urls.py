@@ -19,9 +19,9 @@ from django.contrib import admin
 from django.urls import include, path
 from web_project.views import SystemView
 
+
 urlpatterns = [
     path("admin/", admin.site.urls),
-
     # Dashboard urls
     path("", include("apps.dashboards.urls")),
 
@@ -55,17 +55,17 @@ urlpatterns = [
     # Tables urls
     path("", include("apps.tables.urls")),
     # Group App urls
-    path("group/", include("apps.groupApp.urls")),
+    #path("group/", include("apps.groupApp.urls")),
     # Categorie App urls
-    path("categorie/", include("apps.categorieApp.urls")),
+    #path("categorie/", include("apps.categorieApp.urls")),
     # Depense App urls
-    path("depense/", include("apps.depenseApp.urls")),
+    #path("depense/", include("apps.depenseApp.urls")),
     # Revenue App urls
-    path("revenue/", include("apps.revenueApp.urls")),
+    #path("revenue/", include("apps.revenueApp.urls")),
     # Dette App urls
-    path("dette/", include("apps.detteApp.urls")),
+    #path("dette/", include("apps.detteApp.urls")),
     # Objectifs Epargnes App urls
-    path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
+    #path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
 ]
 
 handler404 = SystemView.as_view(template_name="pages_misc_error.html", status=404)
