@@ -6,6 +6,9 @@ from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django import forms
 from .models import User
+from django.http import JsonResponse
+from django.contrib import messages
+from django.utils import timezone
 
 
 class UserCreationForm(forms.ModelForm):
@@ -179,6 +182,7 @@ class UserChangeForm(forms.ModelForm):
 class UserAdmin(BaseUserAdmin):
     change_list_template = 'admin/userApp/user/change_list.html'
     add_form_template = 'admin/userApp/user/add_form.html'
+    change_user_password_template = "admin/userApp/user/change_password.html"
 
     form = UserChangeForm
     add_form = UserCreationForm
@@ -205,8 +209,89 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('-date_joined',)
     filter_horizontal = ('groups', 'user_permissions',)
 
+    # ========= LOGIQUE ACTIVER / DÉSACTIVER =========
+    def changelist_view(self, request, extra_context=None):
+        """
+        Vue liste personnalisée :
+        - gère l'activation/désactivation via AJAX (fetch)
+        - injecte les stats pour le template (active_count, admin_count...)
+        """
+        # 1) Gestion de l'activation/désactivation via AJAX
+        if (
+            request.method == "POST"
+            and request.headers.get("x-requested-with") == "XMLHttpRequest"
+            and "user_id" in request.POST
+            and "action" in request.POST
+        ):
+            # Vérification des permissions
+            if not self.has_change_permission(request):
+                return JsonResponse(
+                    {"success": False, "message": "Vous n'avez pas la permission de modifier les utilisateurs."},
+                    status=403
+                )
+
+            user_id = request.POST.get("user_id")
+            action = request.POST.get("action")
+
+            try:
+                target_user = self.get_queryset(request).get(pk=user_id)
+            except User.DoesNotExist:
+                return JsonResponse(
+                    {"success": False, "message": "Utilisateur introuvable."},
+                    status=404
+                )
+
+            # On évite qu'un admin se désactive lui-même (optionnel mais conseillé)
+            if target_user == request.user and action == "deactivate":
+                return JsonResponse(
+                    {"success": False, "message": "Vous ne pouvez pas désactiver votre propre compte."},
+                    status=400
+                )
+
+            if action == "deactivate":
+                if not target_user.is_active:
+                    return JsonResponse(
+                        {"success": False, "message": "Ce compte est déjà désactivé."},
+                        status=400
+                    )
+                target_user.is_active = False
+                target_user.save(update_fields=["is_active"])
+                msg = f"Le compte {target_user.email} a été désactivé."
+                messages.success(request, msg)
+                return JsonResponse({"success": True, "message": msg})
+
+            elif action == "activate":
+                if target_user.is_active:
+                    return JsonResponse(
+                        {"success": False, "message": "Ce compte est déjà actif."},
+                        status=400
+                    )
+                target_user.is_active = True
+                target_user.save(update_fields=["is_active"])
+                msg = f"Le compte {target_user.email} a été activé."
+                messages.success(request, msg)
+                return JsonResponse({"success": True, "message": msg})
+
+            else:
+                return JsonResponse(
+                    {"success": False, "message": "Action non reconnue."},
+                    status=400
+                )
+
+        # 2) Stats pour le header (active_count, admin_count, new_users_today)
+        if extra_context is None:
+            extra_context = {}
+
+        qs = self.get_queryset(request)
+        extra_context["active_count"] = qs.filter(is_active=True).count()
+        extra_context["admin_count"] = qs.filter(is_superuser=True).count()
+        today = timezone.now().date()
+        extra_context["new_users_today"] = qs.filter(date_joined__date=today).count()
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+    # ====== (tes méthodes existantes : email_with_avatar, role_badge, status_badge) ======
     def email_with_avatar(self, obj):
-        """Affiche l'email avec un avatar coloré"""
         initial = obj.email[0].upper() if obj.email else '?'
         return format_html(
             '<div style="display: flex; align-items: center; gap: 0.75rem;">'
@@ -225,9 +310,8 @@ class UserAdmin(BaseUserAdmin):
             obj.email
         )
     email_with_avatar.short_description = 'Utilisateur'
-    
+
     def role_badge(self, obj):
-        """Affiche le rôle sous forme de badge coloré"""
         if obj.is_superuser:
             bg_color = '#696cff'
             text_color = 'white'
@@ -249,9 +333,8 @@ class UserAdmin(BaseUserAdmin):
             text
         )
     role_badge.short_description = 'Rôle'
-    
+
     def status_badge(self, obj):
-        """Affiche le statut sous forme de badge coloré"""
         if obj.is_active:
             return format_html(
                 '<span style="padding: 0.25rem 0.625rem; border-radius: 0.25rem; '

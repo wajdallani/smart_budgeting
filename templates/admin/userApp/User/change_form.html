@@ -1,8 +1,12 @@
 {% extends "admin/change_form.html" %}
 {% load static i18n %}
 
+{% block title %}{% endblock %}
+
 {% block content_title %}
 {% endblock %}
+
+
 
 {% block extrahead %}
 {{ block.super }}
@@ -14,18 +18,27 @@
 <link rel="stylesheet" href="{% static 'vendor/fonts/boxicons.css' %}">
 
 <style>
+    /* ==================== MASQUER ÉLÉMENTS DJANGO PAR DÉFAUT ==================== */
     #header,
     #nav-sidebar,
     .breadcrumbs,
-    #toggle-nav-sidebar {
+    #toggle-nav-sidebar,
+    #content > h1,
+    .content-inner > h1:first-of-type,
+    .submit-row {
         display: none !important;
+    }
+
+    * {
+        box-sizing: border-box;
     }
 
     body {
         margin: 0 !important;
         padding: 0 !important;
-        background: #f5f5f9;
-        font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Inter', 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        min-height: 100vh;
     }
 
     #content {
@@ -60,149 +73,243 @@
     }
 
     .content-inner {
-        max-width: 1440px;
+        max-width: 1200px;
         width: 100%;
         margin: 0 auto;
         padding: 0 1rem;
     }
 
+    /* ==================== EN-TÊTE PAGE ==================== */
     .page-header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 2rem;
         margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
     .page-header h4 {
-        font-weight: 600;
-        color: #566a7f;
+        font-weight: 700;
+        color: #2d3748;
         margin-bottom: 0.5rem;
-        font-size: 1.5rem;
-    }
-
-    .page-header p {
-        color: #a1acb8;
-        margin: 0;
-        font-size: 0.9375rem;
-    }
-
-    .form-container {
-        background: white;
-        border-radius: 0.5rem;
-        box-shadow: 0 2px 6px rgba(67, 89, 113, 0.12);
-        overflow: hidden;
-        animation: slideIn 0.4s ease;
-    }
-
-    .form-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 2rem;
-        color: white;
-    }
-
-    .form-header h2 {
-        margin: 0 0 0.5rem 0;
         font-size: 1.75rem;
-        font-weight: 600;
         display: flex;
         align-items: center;
         gap: 0.75rem;
     }
 
-    .form-header h2 i {
+    .page-header h4 i {
+        color: #667eea;
         font-size: 2rem;
     }
 
-    .form-header p {
+    .page-header p {
+        color: #718096;
         margin: 0;
-        opacity: 0.9;
-        font-size: 0.9375rem;
+        font-size: 1rem;
     }
 
-    .form-content {
-        padding: 2rem;
+    /* ==================== CONTENEUR PRINCIPAL ==================== */
+    .form-container {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        border-radius: 1.5rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
-    .form-content > h1,
-    .form-content > .breadcrumbs {
-        display: none !important;
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    fieldset.module {
+    /* ==================== NAVIGATION MULTI-PAGES ==================== */
+    .tabs-navigation {
+        display: flex;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0;
+        margin: 0;
+        position: relative;
+        overflow-x: auto;
+    }
+
+    .tabs-navigation::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .tabs-navigation::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .tabs-navigation::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+    }
+
+    .tab-item {
+        flex: 1;
+        min-width: 200px;
+        padding: 1.5rem 2rem;
+        text-align: center;
+        cursor: pointer;
         background: transparent;
         border: none;
-        padding: 0;
-        margin-bottom: 2rem;
-    }
-
-    fieldset.module h2 {
-        background: #f8f9fa;
-        color: #566a7f;
-        padding: 1rem 1.25rem;
-        border-radius: 0.5rem;
-        margin-bottom: 1.5rem;
-        font-size: 1.125rem;
+        color: rgba(255, 255, 255, 0.7);
         font-weight: 600;
+        font-size: 0.9375rem;
+        transition: all 0.3s ease;
+        position: relative;
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 0.5rem;
-        border-left: 4px solid #696cff;
     }
 
-    fieldset.module h2:before {
-        content: '📋';
+    .tab-item i {
         font-size: 1.25rem;
     }
 
+    .tab-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .tab-item.active {
+        background: white;
+        color: #667eea;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-item.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 3px 3px 0 0;
+    }
+
+    .tab-item .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        font-size: 0.875rem;
+        font-weight: 700;
+        margin-right: 0.5rem;
+    }
+
+    .tab-item.active .step-number {
+        background: #667eea;
+        color: white;
+    }
+
+    /* ==================== CONTENU DES ONGLETS ==================== */
+    .tab-content {
+        display: none;
+        padding: 3rem;
+        animation: fadeIn 0.4s ease;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title i {
+        color: #667eea;
+        font-size: 1.75rem;
+    }
+
+    .section-description {
+        color: #718096;
+        margin-bottom: 2rem;
+        font-size: 0.9375rem;
+    }
+
+    /* ==================== CHAMPS DE FORMULAIRE ==================== */
     .form-row {
-        padding: 1.5rem !important;
-        background: #f8f9fa !important;
-        margin-bottom: 1.25rem !important;
-        border-radius: 0.5rem !important;
-        border-left: 4px solid #696cff !important;
+        padding: 0 !important;
+        background: transparent !important;
+        margin-bottom: 1.75rem !important;
+        border: none !important;
         transition: all 0.3s ease !important;
     }
 
-    .form-row:hover {
-        background: #e9ecef !important;
-        border-left-color: #764ba2 !important;
-        transform: translateX(5px);
+    .field-wrapper {
+        background: #f7fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
     }
 
-    .form-row.errors {
-        border-left-color: #ff4c51 !important;
-        background: #fff5f5 !important;
+    .field-wrapper:hover {
+        border-color: #cbd5e0;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.08);
+    }
+
+    .field-wrapper.focused {
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-row.errors .field-wrapper {
+        border-color: #fc8181;
+        background: #fff5f5;
     }
 
     .form-row label,
     .form-row > div > label {
-        display: inline-block !important;
+        display: flex !important;
+        align-items: center;
+        gap: 0.5rem;
         font-weight: 600 !important;
-        color: #566a7f !important;
+        color: #2d3748 !important;
         font-size: 0.9375rem !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
     }
 
-    /* Astérisque champs obligatoires principaux */
-    .form-row.field-email label:after,
-    .form-row.field-firstname label:after,
-    .form-row.field-lastname label:after,
-    .form-row.field-role label:after {
-        content: " *" !important;
-        color: #ff4c51 !important;
-        font-size: 1.125rem !important;
-        font-weight: bold !important;
-    }
-
-    .form-row label.required:after {
-        content: " *" !important;
-        color: #ff4c51 !important;
-        font-size: 1.125rem !important;
-        font-weight: bold !important;
-    }
-
-    .form-row .asteriskField,
-    .form-row .required {
-        color: #ff4c51 !important;
-        font-size: 1.125rem !important;
-        font-weight: bold !important;
+    .form-row label i {
+        color: #667eea;
+        font-size: 1.125rem;
     }
 
     input[type="text"],
@@ -210,41 +317,27 @@
     input[type="number"],
     input[type="tel"],
     input[type="url"],
+    input[type="password"],
     select,
     textarea {
         width: 100% !important;
-        padding: 0.75rem 1rem !important;
-        border: 2px solid #d9dee3 !important;
+        padding: 0.875rem 1.125rem !important;
+        border: 2px solid transparent !important;
         border-radius: 0.5rem !important;
         font-size: 0.9375rem !important;
         transition: all 0.3s ease !important;
         background: white !important;
-        color: #566a7f !important;
+        color: #2d3748 !important;
         font-family: inherit !important;
     }
 
     input:focus,
     select:focus,
     textarea:focus {
-        border-color: #696cff !important;
+        border-color: #667eea !important;
         outline: none !important;
-        box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.15) !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
         background: white !important;
-    }
-
-    .form-row.errors input[type="text"],
-    .form-row.errors input[type="email"],
-    .form-row.errors select,
-    .form-row.errors textarea {
-        border-color: #ff4c51 !important;
-        background: #fff5f5 !important;
-    }
-
-    .form-row.errors input:focus,
-    .form-row.errors select:focus,
-    .form-row.errors textarea:focus {
-        border-color: #ff4c51 !important;
-        box-shadow: 0 0 0 0.2rem rgba(255, 76, 81, 0.25) !important;
     }
 
     textarea {
@@ -252,36 +345,615 @@
         resize: vertical;
     }
 
+    /* ==================== PERMISSIONS & GROUPES ==================== */
+    .permissions-main {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .permission-main-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 1rem;
+        padding: 2rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .permission-main-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+    }
+
+    .permission-main-card.superuser {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+    }
+
+    .permission-main-card.superuser:hover {
+        box-shadow: 0 12px 32px rgba(245, 158, 11, 0.4);
+    }
+
+    .permission-icon {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+
+    .permission-main-info {
+        flex: 1;
+    }
+
+    .permission-main-info h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .permission-main-info p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 0.9375rem;
+    }
+
+    .permission-toggle {
+        position: relative;
+    }
+
+    .permission-toggle input[type="checkbox"] {
+        width: 56px !important;
+        height: 28px !important;
+        appearance: none;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 14px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .permission-toggle input[type="checkbox"]:checked {
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .permission-toggle input[type="checkbox"]::before {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: white;
+        top: 2px;
+        left: 2px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .permission-toggle input[type="checkbox"]:checked::before {
+        transform: translateX(28px);
+        background: #667eea;
+    }
+
+    .permission-main-card.superuser .permission-toggle input[type="checkbox"]:checked::before {
+        background: #f59e0b;
+    }
+
+    /* Contrôles de permissions */
+    .permissions-controls {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .search-box {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a1acb8;
+        font-size: 1.25rem;
+    }
+
+    .search-box input {
+        width: 100% !important;
+        padding: 1rem 1rem 1rem 3.5rem !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 0.75rem !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .search-box input:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 0.75rem 1.5rem;
+        background: #f7fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.75rem;
+        color: #4a5568;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9375rem;
+    }
+
+    .filter-btn:hover {
+        background: #edf2f7;
+        border-color: #cbd5e0;
+        transform: translateY(-2px);
+    }
+
+    .filter-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .filter-btn i {
+        font-size: 1.125rem;
+    }
+
+    /* Grille de permissions améliorée */
+    .permissions-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .permission-item-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.875rem;
+        padding: 1.25rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .permission-item-card:hover {
+        border-color: #cbd5e0;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .permission-item-card.selected {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+    }
+
+    .permission-item-card.selected::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 0.875rem 0 0 0.875rem;
+    }
+
+    .permission-checkbox-wrapper {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 0.375rem;
+        border: 2px solid #cbd5e0;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .permission-item-card.selected .permission-checkbox-wrapper {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+    }
+
+    .permission-checkbox-wrapper i {
+        color: white;
+        font-size: 1rem;
+        display: none;
+    }
+
+    .permission-item-card.selected .permission-checkbox-wrapper i {
+        display: block;
+    }
+
+    .permission-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .permission-item-name {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 0.9375rem;
+        margin-bottom: 0.375rem;
+        line-height: 1.4;
+    }
+
+    .permission-item-card.selected .permission-item-name {
+        color: #667eea;
+    }
+
+    .permission-item-description {
+        font-size: 0.8125rem;
+        color: #718096;
+        line-height: 1.4;
+    }
+
+    .permission-item-badge {
+        display: inline-block;
+        padding: 0.25rem 0.625rem;
+        background: #edf2f7;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #4a5568;
+        margin-top: 0.5rem;
+    }
+
+    .permission-item-card.selected .permission-item-badge {
+        background: rgba(102, 126, 234, 0.15);
+        color: #667eea;
+    }
+
+    .selected-count {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #667eea;
+    }
+
+    .selected-count i {
+        font-size: 1.25rem;
+    }
+
+    .permissions-grid-enhanced {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 1.5rem;
+    }
+
+    .permissions-selector-wrapper select {
+        width: 100% !important;
+        min-height: 400px !important;
+        padding: 1rem !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 0.75rem !important;
+        font-size: 0.9375rem !important;
+        font-family: inherit !important;
+        background: #f7fafc !important;
+    }
+
+    .permissions-selector-wrapper select option {
+        padding: 0.75rem 1rem !important;
+        border-radius: 0.5rem !important;
+        margin: 0.25rem 0 !important;
+        cursor: pointer !important;
+    }
+
+    .permissions-selector-wrapper select option:checked {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+
+    .permissions-selector-wrapper label {
+        font-size: 1.125rem !important;
+        font-weight: 700 !important;
+        color: #2d3748 !important;
+        margin-bottom: 1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+    }
+
+    .permissions-selector-wrapper label:before {
+        content: '🔐';
+        font-size: 1.5rem;
+    }
+
+    /* Actions rapides */
+    .permissions-quick-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .quick-action-btn {
+        padding: 0.875rem 1.5rem;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.75rem;
+        color: #4a5568;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9375rem;
+    }
+
+    .quick-action-btn:hover {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .quick-action-btn i {
+        font-size: 1.125rem;
+    }
+
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.25rem;
+        margin-top: 1.5rem;
+    }
+
+    .permission-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .permission-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .permission-card.selected {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    }
+
+    .permission-card input[type="checkbox"] {
+        width: 20px !important;
+        height: 20px !important;
+        margin-right: 0.75rem;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+
+    .permission-card label {
+        display: flex !important;
+        align-items: center;
+        cursor: pointer;
+        margin: 0 !important;
+        font-weight: 500 !important;
+        color: #4a5568 !important;
+    }
+
+    .groups-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .group-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .group-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .group-badge input[type="checkbox"] {
+        width: 20px !important;
+        height: 20px !important;
+        cursor: pointer;
+        accent-color: white;
+    }
+
+    .group-badge label {
+        margin: 0 !important;
+        cursor: pointer;
+        font-weight: 600 !important;
+        flex: 1;
+    }
+
+    .group-badge i {
+        font-size: 1.5rem;
+    }
+
+    /* ==================== MOT DE PASSE ==================== */
+    .password-section {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        border: 2px dashed #cbd5e0;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .password-section i {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+
+    .password-section h3 {
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+        font-size: 1.25rem;
+    }
+
+    .password-section p {
+        color: #718096;
+        margin-bottom: 1.5rem;
+    }
+
+    .password-change-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white !important;
+        text-decoration: none !important;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .password-change-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        text-decoration: none !important;
+        color: white !important;
+    }
+    
+    .password-change-btn i {
+        color: white !important;
+    }
+    
+    .password-change-btn:link,
+    .password-change-btn:visited,
+    .password-change-btn:active {
+        color: white !important;
+        text-decoration: none !important;
+    }
+    
+    a.password-change-btn {
+        color: white !important;
+    }
+
+    .password-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        background: white;
+        border-left: 4px solid #667eea;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        margin-top: 1.5rem;
+        text-align: left;
+    }
+
+    .password-info i {
+        font-size: 1.5rem;
+        color: #667eea;
+        margin: 0;
+    }
+
+    .password-info div {
+        flex: 1;
+    }
+
+    .password-info h4 {
+        color: #2d3748;
+        margin: 0 0 0.5rem 0;
+        font-size: 1rem;
+    }
+
+    .password-info ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: #718096;
+        font-size: 0.875rem;
+    }
+
+    /* ==================== MESSAGES ==================== */
     .help,
     .helptext,
     p.help {
-        color: #a1acb8 !important;
+        color: #718096 !important;
         font-size: 0.8125rem !important;
         font-style: italic !important;
-        margin-top: 0.375rem !important;
-        display: block !important;
-        line-height: 1.5 !important;
+        margin-top: 0.5rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.375rem !important;
+    }
+
+    .help:before {
+        content: 'ℹ';
+        color: #667eea;
     }
 
     ul.errorlist {
-        background: #ffe0db !important;
-        border-left: 4px solid #ff4c51 !important;
-        padding: 0.75rem 1rem !important;
-        margin: 0.5rem 0 0 0 !important;
-        border-radius: 0.375rem !important;
+        background: #fff5f5 !important;
+        border-left: 4px solid #fc8181 !important;
+        padding: 1rem 1.25rem !important;
+        margin: 0.75rem 0 0 0 !important;
+        border-radius: 0.5rem !important;
         list-style: none !important;
         display: block !important;
     }
 
     ul.errorlist li {
-        color: #ff4c51 !important;
+        color: #c53030 !important;
         font-weight: 600 !important;
         font-size: 0.875rem !important;
         display: flex !important;
         align-items: center !important;
         gap: 0.5rem !important;
-        margin: 0 !important;
-        padding: 0.25rem 0 !important;
+        margin: 0.25rem 0 !important;
+        padding: 0 !important;
         list-style: none !important;
     }
 
@@ -293,177 +965,509 @@
 
     .errornote,
     p.errornote {
-        background: #ffe0db !important;
-        border-left: 4px solid #ff4c51 !important;
-        padding: 1rem 1.25rem !important;
-        margin: 0 0 1.5rem 0 !important;
-        border-radius: 0.5rem !important;
-        color: #ff4c51 !important;
+        background: #fff5f5 !important;
+        border-left: 4px solid #fc8181 !important;
+        padding: 1.25rem 1.5rem !important;
+        margin: 0 0 2rem 0 !important;
+        border-radius: 0.75rem !important;
+        color: #c53030 !important;
         font-weight: 600 !important;
         display: flex !important;
         align-items: center !important;
-        gap: 0.5rem !important;
+        gap: 0.75rem !important;
+        font-size: 1rem !important;
     }
 
     .errornote:before,
     p.errornote:before {
         content: '⚠' !important;
-        font-size: 1.25rem !important;
+        font-size: 1.5rem !important;
     }
 
-    .form-row .errors,
-    .form-row span.errors {
-        color: #ff4c51 !important;
-        font-weight: 600 !important;
-        font-size: 0.875rem !important;
-        display: block !important;
-        margin-top: 0.5rem !important;
+    .required-fields-note {
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+        border-left: 4px solid #f59e0b;
+        padding: 1rem 1.25rem;
+        margin-bottom: 2rem;
+        border-radius: 0.75rem;
+        color: #92400e;
+        font-size: 0.9375rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
     }
 
-    .submit-row {
-        background: #f8f9fa;
-        padding: 1.5rem 2rem;
-        border-radius: 0 0 0.5rem 0.5rem;
+    .required-fields-note:before {
+        content: 'ℹ';
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #f59e0b;
+    }
+
+    /* ==================== BARRE D'ACTIONS ==================== */
+    .action-bar {
+        background: linear-gradient(to right, #f7fafc, #edf2f7);
+        padding: 2rem;
+        border-radius: 0 0 1.5rem 1.5rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 1rem;
         flex-wrap: wrap;
-        border-top: 1px solid #e7e7ff;
+        border-top: 2px solid #e2e8f0;
     }
 
-    input[type="submit"],
-    .submit-row input[type="submit"],
-    button[type="submit"] {
-        padding: 0.875rem 2rem !important;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary {
+        padding: 1rem 2rem !important;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
+        color:white !important;
         border: none !important;
-        border-radius: 0.5rem !important;
+        border-radius: 0.75rem !important;
         font-weight: 600 !important;
         font-size: 0.9375rem !important;
         cursor: pointer !important;
         transition: all 0.3s ease !important;
-        box-shadow: 0 4px 12px rgba(105, 108, 255, 0.3) !important;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3) !important;
         display: inline-flex !important;
         align-items: center !important;
         gap: 0.5rem !important;
     }
 
-    input[type="submit"]:hover,
-    button[type="submit"]:hover {
+    .btn-primary:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(105, 108, 255, 0.4) !important;
+        box-shadow: 0 8px 20px rgba(72, 187, 120, 0.4) !important;
     }
 
-    input[type="submit"]:active,
-    button[type="submit"]:active {
-        transform: translateY(0) !important;
-    }
-
-    .cancel-link {
-        color: #a1acb8 !important;
-        text-decoration: none !important;
-        padding: 0.875rem 1.5rem !important;
-        border-radius: 0.5rem !important;
+    .btn-secondary {
+        padding: 1rem 2rem !important;
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%) !important;
+        color:white !important;
+        border: none !important;
+        border-radius: 0.75rem !important;
+        font-weight: 600 !important;
+        font-size: 0.9375rem !important;
+        cursor: pointer !important;
         transition: all 0.3s ease !important;
-        font-weight: 500 !important;
+        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3) !important;
         display: inline-flex !important;
         align-items: center !important;
         gap: 0.5rem !important;
     }
 
-    .cancel-link:hover {
-        background: #e9ecef !important;
-        color: #566a7f !important;
+    .btn-secondary:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(66, 153, 225, 0.4) !important;
     }
 
-    .inline-group {
+    .secondary-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-link {
+        color: #2d3748 !important;
+        text-decoration: none !important;
+        padding: 1rem 1.5rem !important;
+        border-radius: 0.75rem !important;
+        transition: all 0.3s ease !important;
+        font-weight: 600 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
         background: white;
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid #e7e7ff;
+        border: 2px solid #e2e8f0;
     }
 
-    .success {
-        background: #d4f4dd !important;
-        border-left: 4px solid #28c76f !important;
-        padding: 1rem 1.25rem !important;
-        margin: 1.5rem 0 !important;
-        border-radius: 0.5rem !important;
-        color: #1e7e34 !important;
-        font-weight: 500 !important;
+    .btn-link:hover {
+        border-color: #cbd5e0;
+        color: #2d3748 !important;
+        text-decoration: none !important;
     }
 
+    .btn-danger {
+        color: #c53030 !important;
+        border-color: #fc8181 !important;
+    }
+
+    .btn-danger:hover {
+        background: #fff5f5 !important;
+        border-color: #fc8181 !important;
+        color: #c53030 !important;
+    }
+
+    /* ==================== NAVIGATION ONGLETS ==================== */
+    .tab-navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e2e8f0;
+    }
+
+    .nav-btn {
+        padding: 0.875rem 2rem;
+        background: white;
+        color:black;
+        border: 2px solid #667eea;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .nav-btn:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .nav-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* ==================== INDICATEUR PROGRESSION ==================== */
+    .progress-indicator {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 0;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .progress-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .progress-dot.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        width: 40px;
+        border-radius: 6px;
+    }
+
+    /* ==================== MODAL ALERTS ==================== */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-alert {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 0;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+    }
+
+    .modal-icon-container {
+        padding: 2.5rem 2rem 1.5rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .modal-icon-wrapper {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .modal-icon-wrapper.success {
+        background: linear-gradient(135deg, #d4f4dd 0%, #b7f0c3 100%);
+    }
+
+    .modal-icon-wrapper.error {
+        background: linear-gradient(135deg, #ffe0db 0%, #ffc9c0 100%);
+    }
+
+    .modal-icon {
+        font-size: 3.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .modal-icon.success {
+        color: #28c76f;
+        animation: successPop 0.5s ease 0.2s backwards;
+    }
+
+    .modal-icon.error {
+        color: #ff4c51;
+        animation: errorShake 0.5s ease 0.2s backwards;
+    }
+
+    @keyframes successPop {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.2);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes errorShake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        20%, 60% {
+            transform: translateX(-10px);
+        }
+        40%, 80% {
+            transform: translateX(10px);
+        }
+    }
+
+    .confetti {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        opacity: 0;
+    }
+
+    .modal-icon-wrapper.success .confetti {
+        animation: confettiFall 1s ease-out forwards;
+    }
+
+    .confetti:nth-child(1) { background: #56ab2f; top: 20%; left: 10%; animation-delay: 0s; }
+    .confetti:nth-child(2) { background: #a8e063; top: 30%; left: 20%; animation-delay: 0.1s; }
+    .confetti:nth-child(3) { background: #667eea; top: 25%; right: 15%; animation-delay: 0.2s; }
+    .confetti:nth-child(4) { background: #764ba2; top: 35%; right: 25%; animation-delay: 0.15s; }
+    .confetti:nth-child(5) { background: #f09819; top: 40%; left: 30%; animation-delay: 0.25s; }
+    .confetti:nth-child(6) { background: #edde5d; top: 45%; right: 30%; animation-delay: 0.3s; }
+
+    @keyframes confettiFall {
+        0% {
+            opacity: 1;
+            transform: translateY(0) rotate(0deg);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(100px) rotate(720deg);
+        }
+    }
+
+    .modal-content {
+        padding: 0 2rem 1.5rem;
+        text-align: center;
+    }
+
+    .modal-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .modal-message {
+        font-size: 1rem;
+        color: #718096;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .modal-footer {
+        padding: 1.5rem 2rem 2rem;
+        text-align: center;
+    }
+
+    .modal-btn {
+        padding: 1rem 3rem;
+        border: none;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        min-width: 180px;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-btn.success {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    }
+
+    .modal-btn.success:hover {
+        background: linear-gradient(135deg, #4a9527 0%, #95c956 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(86, 171, 47, 0.4);
+    }
+
+    .modal-btn.error {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+    }
+
+    .modal-btn.error:hover {
+        background: linear-gradient(135deg, #ff5252 0%, #ff6e6e 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    /* ==================== RESPONSIVE ==================== */
     @media (max-width: 768px) {
         .layout-page {
             margin-left: 0.5rem;
             margin-right: 0.5rem;
         }
 
-        .form-header {
+        .page-header,
+        .tab-content {
             padding: 1.5rem;
         }
 
-        .form-header h2 {
-            font-size: 1.5rem;
+        .tabs-navigation {
+            flex-wrap: nowrap;
+            overflow-x: auto;
         }
 
-        .form-content {
-            padding: 1.5rem;
-        }
-
-        .form-row {
-            padding: 1rem !important;
-        }
-
-        .submit-row {
-            flex-direction: column;
+        .tab-item {
+            min-width: 140px;
             padding: 1rem 1.5rem;
+            font-size: 0.875rem;
         }
 
-        input[type="submit"],
-        .cancel-link {
+        .tab-item span:not(.step-number) {
+            display: none;
+        }
+
+        .permissions-grid,
+        .groups-container {
+            grid-template-columns: 1fr;
+        }
+
+        .action-bar {
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .action-buttons,
+        .secondary-actions {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .btn-primary,
+        .btn-secondary,
+        .btn-link {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .tab-navigation-buttons {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .nav-btn {
             width: 100%;
             justify-content: center;
         }
     }
 
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    /* ==================== MASQUER ÉLÉMENTS NON UTILISÉS ==================== */
+    .form-content > h1,
+    .form-content > .breadcrumbs,
+    fieldset.module {
+        display: none !important;
     }
 
-    .required-fields-note {
-        background: #fff3cd !important;
-        border-left: 4px solid #ffc107 !important;
-        padding: 0.75rem 1rem !important;
-        margin-bottom: 1.5rem !important;
-        border-radius: 0.375rem !important;
-        color: #856404 !important;
-        font-size: 0.875rem !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.5rem !important;
+    .success {
+        display: none !important;
     }
-
-    .required-fields-note:before {
-        content: 'ℹ' !important;
-        font-size: 1.125rem !important;
-        font-weight: bold !important;
-    }
-
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Modal Alert Container -->
+<div class="modal-overlay" id="alertModal">
+    <div class="modal-alert">
+        <div class="modal-icon-container">
+            <div class="modal-icon-wrapper" id="modalIconWrapper">
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <i class="bx modal-icon" id="modalIcon"></i>
+            </div>
+        </div>
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <p class="modal-message" id="modalMessage"></p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn" id="modalButton" onclick="closeModal()"></button>
+        </div>
+    </div>
+</div>
+
 <div class="layout-wrapper layout-content-navbar">
   <div class="layout-container">
 
@@ -476,86 +1480,305 @@
       <div class="content-wrapper">
         <div class="content-inner">
 
+          <!-- En-tête de la page -->
           <div class="page-header">
             <h4>
-              <span style="color: #a1acb8;">Administration / Utilisateurs /</span> 
-              Modifier l'utilisateur
+              <i class='bx bx-user-circle'></i>
+              Gestion des Utilisateurs
             </h4>
-            <p>
-              Mettez à jour les informations de l'utilisateur ci-dessous
-            </p>
+            <p>Modifiez les informations, permissions et paramètres du compte utilisateur</p>
           </div>
 
+          <!-- Conteneur du formulaire -->
           <div class="form-container">
             
-            <div class="form-header">
-              <h2>
-                <i class='bx bx-user-circle'></i>
-                Modifier : {{ original }}
-              </h2>
-              <p>
-                Ajustez les données du compte utilisateur, ou utilisez le lien de changement de mot de passe si nécessaire.
-              </p>
+            <!-- Indicateur de progression -->
+            <div class="progress-indicator">
+              <div class="progress-dot active" data-tab="0"></div>
+              <div class="progress-dot" data-tab="1"></div>
+              <div class="progress-dot" data-tab="2"></div>
             </div>
 
-            <div class="form-content">
+            <!-- Navigation par onglets -->
+            <div class="tabs-navigation">
+              <button class="tab-item active" data-tab="info-tab">
+                <span class="step-number">1</span>
+                <i class='bx bx-user'></i>
+                <span>Informations</span>
+              </button>
+              <button class="tab-item" data-tab="password-tab">
+                <span class="step-number">2</span>
+                <i class='bx bx-lock'></i>
+                <span>Mot de passe</span>
+              </button>
+              <button class="tab-item" data-tab="permissions-tab">
+                <span class="step-number">3</span>
+                <i class='bx bx-shield'></i>
+                <span>Permissions</span>
+              </button>
+            </div>
 
-              <div class="required-fields-note">
-                Les champs marqués d'un <span style="color: #ff4c51;">*</span> sont obligatoires
+            <form method="post" enctype="multipart/form-data" id="user_form">
+              {% csrf_token %}
+
+<!-- Onglet 1: Informations -->
+              <div class="tab-content active" id="info-tab">
+                <div class="section-title">
+                  <i class='bx bx-user-circle'></i>
+                  Informations Personnelles
+                </div>
+                <p class="section-description">
+                  Renseignez les informations de base de l'utilisateur
+                </p>
+
+                {% if adminform.non_field_errors %}
+                  {% for error in adminform.non_field_errors %}
+                    <p class="errornote">{{ error }}</p>
+                  {% endfor %}
+                {% elif adminform.errors or inline_admin_formsets.errors %}
+                  <p class="errornote">Veuillez corriger les erreurs avant de continuer.</p>
+                {% endif %}
+
+                <div id="basic-fields">
+                  {% for fieldset in adminform %}
+                    {% for line in fieldset %}
+                      {% for field in line %}
+                        {% if field.field.name not in 'password,user_permissions,groups,is_superuser,is_staff,date_joined,last_login,updated_at' and 'permission' not in field.field.name %}
+                          <div class="form-row field-{{ field.field.name }} {% if field.errors %}errors{% endif %}">
+                            <div class="field-wrapper">
+                              {{ field.label_tag }}
+                              {{ field.field }}
+                              {% if field.help_text %}
+                                <p class="help">{{ field.help_text }}</p>
+                              {% endif %}
+                              {{ field.errors }}
+                            </div>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    {% endfor %}
+                  {% endfor %}
+                </div>
+
+                <div class="tab-navigation-buttons">
+                  <button type="button" class="nav-btn" disabled>
+                    <i class='bx bx-chevron-left'></i> Précédent
+                  </button>
+                  <button type="button" class="nav-btn" onclick="nextTab()">
+                    Suivant <i class='bx bx-chevron-right'></i>
+                  </button>
+                </div>
               </div>
 
-              {% if adminform.non_field_errors %}
-                {% for error in adminform.non_field_errors %}
-                  <p class="errornote">{{ error }}</p>
-                {% endfor %}
-              {% elif adminform.errors or inline_admin_formsets.errors %}
-                <p class="errornote">Veuillez corriger les erreurs ci-dessous.</p>
-              {% endif %}
+              
+<!-- Onglet 2: Mot de passe -->
+              <div class="tab-content" id="password-tab">
+                <div class="section-title">
+                  <i class='bx bx-lock-alt'></i>
+                  Gestion du Mot de Passe
+                </div>
+                <p class="section-description">
+                  Modifiez le mot de passe de l'utilisateur en toute sécurité
+                </p>
 
-              <form method="post" enctype="multipart/form-data" id="user_form">
-                {% csrf_token %}
+                <div class="password-section">
+                  <i class='bx bx-key'></i>
+                  <h3>Changement de Mot de Passe</h3>
+                  <p>Pour des raisons de sécurité, utilisez le formulaire dédié pour modifier le mot de passe</p>
+                  
+                  <a href="{% url 'admin:auth_user_password_change' original.pk %}" class="password-change-btn">
+                    <i class='bx bx-lock-open'></i>
+                    Modifier le mot de passe
+                  </a>
 
-                {% block field_sets %}
-                  {% for fieldset in adminform %}
-                    {% include "admin/includes/fieldset.html" %}
-                  {% endfor %}
-                {% endblock %}
-
-                {% block inline_field_sets %}
-                  {% for inline_admin_formset in inline_admin_formsets %}
-                    {% include inline_admin_formset.opts.template %}
-                  {% endfor %}
-                {% endblock %}
-
-                <div class="submit-row">
-                  <div>
-                    <button type="submit" name="_save" style="background: #28c76f;">
-                      <i class='bx bx-save'></i>
-                      Enregistrer les modifications
-                    </button>
-                    <button type="submit" name="_continue" style="background: #03c3ec;">
-                      <i class='bx bx-edit'></i>
-                      Enregistrer et continuer l’édition
-                    </button>
-                  </div>
-                  <div>
-                    <a href="{% url 'admin:userApp_user_changelist' %}" class="cancel-link">
-                      <i class='bx bx-arrow-back'></i>
-                      Retour à la liste
-                    </a>
-                    <a href="{% url 'admin:userApp_user_delete' original.pk %}" 
-                       class="cancel-link" 
-                       style="color: #ff4c51;"
-                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
-                      <i class='bx bx-trash'></i>
-                      Supprimer
-                    </a>
+                  <div class="password-info">
+                    <i class='bx bx-info-circle'></i>
+                    <div>
+                      <h4>Règles de sécurité</h4>
+                      <ul>
+                        <li>Le mot de passe doit contenir au moins 8 caractères</li>
+                        <li>Utilisez une combinaison de lettres, chiffres et caractères spéciaux</li>
+                        <li>Évitez les mots de passe trop courants ou prévisibles</li>
+                        <li>Ne partagez jamais votre mot de passe</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
 
-              </form>
+                <div class="tab-navigation-buttons">
+                  <button type="button" class="nav-btn" onclick="prevTab()">
+                    <i class='bx bx-chevron-left'></i> Précédent
+                  </button>
+                  <button type="button" class="nav-btn" onclick="nextTab()">
+                    Suivant <i class='bx bx-chevron-right'></i>
+                  </button>
+                </div>
+              </div>
 
-            </div>
+              
+              
+              <!-- Onglet 3: Permissions -->
+              <div class="tab-content" id="permissions-tab">
+                <div class="section-title">
+                  <i class='bx bx-shield-quarter'></i>
+                  Permissions Utilisateur
+                </div>
+                <p class="section-description">
+                  Cliquez sur les cartes pour sélectionner ou désélectionner les permissions
+                </p>
+
+                <!-- Permissions Principales -->
+                <div class="permissions-main">
+                  <div class="permission-main-card">
+                    <div class="permission-icon staff">
+                      <i class='bx bx-user-check'></i>
+                    </div>
+                    <div class="permission-main-info">
+                      <h3>Statut Équipe</h3>
+                      <p>Permet l'accès à l'interface d'administration</p>
+                    </div>
+                    <div class="permission-toggle">
+                      {% for fieldset in adminform %}
+                        {% for line in fieldset %}
+                          {% for field in line %}
+                            {% if field.field.name == 'is_staff' %}
+                              {{ field.field }}
+                              <label for="{{ field.field.id_for_label }}" class="toggle-label"></label>
+                            {% endif %}
+                          {% endfor %}
+                        {% endfor %}
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                  <div class="permission-main-card superuser">
+                    <div class="permission-icon superuser">
+                      <i class='bx bx-crown'></i>
+                    </div>
+                    <div class="permission-main-info">
+                      <h3>Super-Utilisateur</h3>
+                      <p>Accès complet et illimité à toutes les fonctionnalités</p>
+                    </div>
+                    <div class="permission-toggle">
+                      {% for fieldset in adminform %}
+                        {% for line in fieldset %}
+                          {% for field in line %}
+                            {% if field.field.name == 'is_superuser' %}
+                              {{ field.field }}
+                              <label for="{{ field.field.id_for_label }}" class="toggle-label"></label>
+                            {% endif %}
+                          {% endfor %}
+                        {% endfor %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Barre de recherche et filtres -->
+                <div class="permissions-controls">
+                  <div class="search-box">
+                    <i class='bx bx-search'></i>
+                    <input type="text" id="permission-search" placeholder="Rechercher une permission...">
+                  </div>
+                  <div class="filter-buttons">
+                    <button type="button" class="filter-btn active" data-filter="all">
+                      <i class='bx bx-list-ul'></i> Toutes (<span id="count-all">0</span>)
+                    </button>
+                    <button type="button" class="filter-btn" data-filter="user">
+                      <i class='bx bx-user'></i> Utilisateurs (<span id="count-user">0</span>)
+                    </button>
+                    <button type="button" class="filter-btn" data-filter="auth">
+                      <i class='bx bx-lock-alt'></i> Auth (<span id="count-auth">0</span>)
+                    </button>
+                    <button type="button" class="filter-btn" data-filter="admin">
+                      <i class='bx bx-cog'></i> Admin (<span id="count-admin">0</span>)
+                    </button>
+                    <button type="button" class="filter-btn" data-filter="autres">
+                      <i class='bx bx-dots-horizontal-rounded'></i> Autres (<span id="count-autres">0</span>)
+                    </button>
+                  </div>
+                  <div class="selected-count">
+                    <i class='bx bx-check-circle'></i>
+                    <span id="selected-permissions-count">0</span> permission(s) sélectionnée(s)
+                  </div>
+                </div>
+
+                <!-- Grille des permissions sous forme de cartes -->
+                <div class="permissions-cards-grid" id="permissions-cards-container">
+                  <!-- Les cartes seront générées par JavaScript -->
+                </div>
+
+                <!-- Le vrai select Django (caché visuellement mais actif) -->
+                <div id="django-permissions-select" style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;">
+                  {% for fieldset in adminform %}
+                    {% for line in fieldset %}
+                      {% for field in line %}
+                        {% if field.field.name == 'user_permissions' %}
+                          {{ field.field }}
+                        {% endif %}
+                      {% endfor %}
+                    {% endfor %}
+                  {% endfor %}
+                </div>
+
+                <!-- Actions rapides -->
+                <div class="permissions-quick-actions">
+                  <button type="button" class="quick-action-btn" onclick="selectAllVisiblePermissions()">
+                    <i class='bx bx-check-double'></i>
+                    Tout sélectionner
+                  </button>
+                  <button type="button" class="quick-action-btn" onclick="deselectAllPermissions()">
+                    <i class='bx bx-x'></i>
+                    Tout désélectionner
+                  </button>
+                  <button type="button" class="quick-action-btn" onclick="invertSelection()">
+                    <i class='bx bx-transfer-alt'></i>
+                    Inverser la sélection
+                  </button>
+                  <button type="button" class="quick-action-btn" onclick="debugPermissions()" style="background: #ff9800; border-color: #ff9800; color: white;">
+                    <i class='bx bx-bug'></i>
+                    Debug (Console)
+                  </button>
+                </div>
+
+                <div class="tab-navigation-buttons">
+                  <button type="button" class="nav-btn" onclick="prevTab()">
+                    <i class='bx bx-chevron-left'></i> Précédent
+                  </button>
+                  <button type="button" class="nav-btn" disabled>
+                    Suivant <i class='bx bx-chevron-right'></i>
+                  </button>
+                </div>
+              </div>
+
+              
+              <!-- Barre d'actions -->
+              <div class="action-bar">
+                <div class="action-buttons">
+                  <button type="submit" name="_save" class="btn-primary">
+                    <i class='bx bx-save'></i>
+                    Enregistrer
+                  </button>
+                  <button type="submit" name="_continue" class="btn-secondary">
+                    <i class='bx bx-edit'></i>
+                    Enregistrer et continuer
+                  </button>
+                </div>
+                <div class="secondary-actions">
+                  <a href="{% url 'admin:userApp_user_changelist' %}" class="btn-link">
+                    <i class='bx bx-arrow-back'></i>
+                    Retour à la liste
+                  </a>
+                  <a href="{% url 'admin:userApp_user_delete' original.pk %}" 
+                     class="btn-link btn-danger"
+                     onclick="return confirm('⚠ Êtes-vous certain de vouloir supprimer cet utilisateur ? Cette action est irréversible.');">
+                    <i class='bx bx-trash'></i>
+                    Supprimer
+                  </a>
+                </div>
+              </div>
+
+            </form>
           </div>
 
         </div>
@@ -566,87 +1789,565 @@
 </div>
 
 <script>
+// Modal Alert Functions
+function showAlert(type, title, message, buttonText) {
+    const modal = document.getElementById('alertModal');
+    const iconWrapper = document.getElementById('modalIconWrapper');
+    const icon = document.getElementById('modalIcon');
+    const titleEl = document.getElementById('modalTitle');
+    const messageEl = document.getElementById('modalMessage');
+    const button = document.getElementById('modalButton');
+
+    // Réinitialiser les classes
+    iconWrapper.className = 'modal-icon-wrapper';
+    icon.className = 'bx modal-icon';
+    button.className = 'modal-btn';
+
+    // Configurer selon le type
+    if (type === 'success') {
+        iconWrapper.classList.add('success');
+        icon.classList.add('success', 'bx-check-circle');
+        button.classList.add('success');
+    } else {
+        iconWrapper.classList.add('error');
+        icon.classList.add('error', 'bx-error-circle');
+        button.classList.add('error');
+    }
+
+    // Définir le contenu
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    button.textContent = buttonText;
+
+    // Afficher la modal
+    modal.classList.add('active');
+
+    // Fermer automatiquement après 3 secondes pour les succès
+    if (type === 'success') {
+        setTimeout(() => {
+            closeModal();
+        }, 3000);
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('alertModal');
+    modal.classList.remove('active');
+}
+
+// Fermer la modal en cliquant en dehors
+document.getElementById('alertModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('user_form');
+    const tabs = document.querySelectorAll('.tab-item');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const progressDots = document.querySelectorAll('.progress-dot');
+    let currentTab = 0;
 
-    // Auto-focus
-    const firstInput = document.querySelector('.form-row input:not([type="hidden"])');
+    // Vérifier s'il y a des messages de succès Django
+    const djangoSuccess = document.querySelector('.success');
+    if (djangoSuccess) {
+        showAlert('success', 'SUCCÈS!', "L'utilisateur a été enregistré avec succès.", 'TERMINÉ');
+    }
+
+    // Vérifier s'il y a des erreurs
+    const djangoErrors = document.querySelector('.errornote');
+    if (djangoErrors) {
+        showAlert('error', 'ERREUR...', 'Une erreur s\'est produite. Veuillez réessayer.', 'RÉESSAYER');
+    }
+
+    function showTab(index) {
+        tabContents.forEach(content => content.classList.remove('active'));
+        tabs.forEach(tab => tab.classList.remove('active'));
+        progressDots.forEach(dot => dot.classList.remove('active'));
+
+        tabContents[index].classList.add('active');
+        tabs[index].classList.add('active');
+        progressDots[index].classList.add('active');
+        
+        currentTab = index;
+        updateNavigationButtons();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => showTab(index));
+    });
+
+    window.nextTab = function() {
+        if (currentTab < tabs.length - 1) {
+            showTab(currentTab + 1);
+        }
+    };
+
+    window.prevTab = function() {
+        if (currentTab > 0) {
+            showTab(currentTab - 1);
+        }
+    };
+
+    function updateNavigationButtons() {
+        const prevButtons = document.querySelectorAll('.tab-navigation-buttons .nav-btn:first-child');
+        const nextButtons = document.querySelectorAll('.tab-navigation-buttons .nav-btn:last-child');
+        
+        prevButtons.forEach(btn => {
+            btn.disabled = currentTab === 0;
+        });
+        
+        nextButtons.forEach(btn => {
+            btn.disabled = currentTab === tabs.length - 1;
+        });
+    }
+
+    const firstInput = document.querySelector('#info-tab input:not([type="hidden"])');
     if (firstInput) {
         firstInput.focus();
     }
 
-    // Helpers erreurs client
-    function clearClientErrors(field) {
-        const row = field.closest('.form-row');
-        if (!row) return;
-        row.classList.remove('errors');
-        const existing = row.querySelector('.client-error');
-        if (existing) existing.remove();
-    }
-
-    function showClientError(field, message) {
-        const row = field.closest('.form-row');
-        if (!row) return;
-        row.classList.add('errors');
-        clearClientErrors(field);
-        const err = document.createElement('div');
-        err.className = 'client-error';
-        err.textContent = message;
-        err.style.color = '#ff4c51';
-        err.style.fontSize = '0.85rem';
-        err.style.marginTop = '0.35rem';
-        err.style.fontWeight = '600';
-        row.appendChild(err);
-    }
-
-    // Validation live pour les champs requis
-    if (form) {
-        const requiredNames = ['email', 'firstname', 'lastname', 'role'];
-        const inputs = requiredNames
-            .map(name => form.querySelector(`[name="${name}"]`))
-            .filter(Boolean);
-
-        inputs.forEach(input => {
-            input.setAttribute('required', 'required');
-
-            input.addEventListener('blur', () => {
-                clearClientErrors(input);
-                const value = (input.value || '').trim();
-
-                if (!value) {
-                    showClientError(input, 'Ce champ est obligatoire.');
-                    return;
-                }
-
-                if (input.name === 'email') {
-                    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!re.test(value)) {
-                        showClientError(input, "Veuillez saisir un email valide.");
-                    }
-                }
-            });
+    const allInputs = document.querySelectorAll('input, select, textarea');
+    allInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            const wrapper = this.closest('.field-wrapper');
+            if (wrapper) wrapper.classList.add('focused');
         });
 
-        // Alerte avant de quitter si le formulaire a changé
-        let formChanged = false;
-        const allInputs = form.querySelectorAll('input, select, textarea');
-        allInputs.forEach(input => {
-            input.addEventListener('change', () => {
-                formChanged = true;
-            });
+        input.addEventListener('blur', function() {
+            const wrapper = this.closest('.field-wrapper');
+            if (wrapper) wrapper.classList.remove('focused');
         });
-        
-        window.addEventListener('beforeunload', (e) => {
-            if (formChanged) {
-                e.preventDefault();
-                e.returnValue = 'Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?';
+    });
+
+    const permissionCards = document.querySelectorAll('.permission-card');
+    permissionCards.forEach(card => {
+        const checkbox = card.querySelector('input[type="checkbox"]');
+        if (checkbox) {
+            if (checkbox.checked) {
+                card.classList.add('selected');
             }
+
+            card.addEventListener('click', function(e) {
+                if (e.target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    card.classList.toggle('selected', checkbox.checked);
+                }
+            });
+
+            checkbox.addEventListener('change', function() {
+                card.classList.toggle('selected', this.checked);
+            });
+        }
+    });
+
+    let formChanged = false;
+    const formInputs = form.querySelectorAll('input, select, textarea');
+    formInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            formChanged = true;
+        });
+    });
+    
+    window.addEventListener('beforeunload', (e) => {
+        if (formChanged) {
+            e.preventDefault();
+            e.returnValue = 'Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?';
+        }
+    });
+    
+    form.addEventListener('submit', (e) => {
+        // SOLUTION: Créer des inputs cachés pour chaque permission sélectionnée
+        const selectedCards = document.querySelectorAll('.permission-item-card.selected');
+        
+        console.log('🔄 Préparation de la soumission...');
+        console.log('📊 Nombre de cartes sélectionnées:', selectedCards.length);
+        
+        // Supprimer les anciens inputs cachés créés précédemment
+        const oldInputs = form.querySelectorAll('input[name="user_permissions"][data-custom]');
+        oldInputs.forEach(input => input.remove());
+        
+        // Créer un input caché pour chaque permission sélectionnée
+        selectedCards.forEach(card => {
+            const value = card.dataset.value;
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'user_permissions';
+            input.value = value;
+            input.setAttribute('data-custom', 'true'); // Pour pouvoir les supprimer plus tard
+            form.appendChild(input);
+            
+            console.log('➕ Input caché créé pour permission:', value);
         });
         
-        form.addEventListener('submit', () => {
-            formChanged = false;
+        // Désactiver le select Django pour éviter les conflits
+        const permissionsSelect = document.getElementById('id_user_permissions') ||
+                                 document.getElementById('id_user_permissions_to');
+        
+        if (permissionsSelect) {
+            // On désactive temporairement le select pour qu'il ne soit pas soumis
+            permissionsSelect.setAttribute('disabled', 'disabled');
+            console.log('🔒 Select Django désactivé temporairement');
+        }
+        
+        // Vérifier le FormData final
+        const formData = new FormData(form);
+        const permissionsInForm = formData.getAll('user_permissions');
+        console.log('✅ Permissions dans le FormData final:', permissionsInForm);
+        console.log('📮 Nombre de permissions à soumettre:', permissionsInForm.length);
+        
+        if (permissionsInForm.length === 0 && selectedCards.length > 0) {
+            console.error('❌ PROBLÈME: Aucune permission dans le FormData!');
+        } else {
+            console.log('✅ SUCCESS: Les permissions seront soumises correctement!');
+        }
+        
+        formChanged = false;
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+            return;
+        }
+
+        if (e.key === 'ArrowRight') {
+            window.nextTab();
+        } else if (e.key === 'ArrowLeft') {
+            window.prevTab();
+        }
+    });
+
+    // ==================== GESTION DES PERMISSIONS ====================
+    // Le select de permissions peut avoir différents IDs selon la config Django
+    const permissionsSelect = document.getElementById('id_user_permissions') ||
+                             document.getElementById('id_user_permissions_to') || 
+                             document.querySelector('select[name="user_permissions"]');
+    
+    console.log('Select trouvé au chargement:', permissionsSelect);
+    console.log('ID du select:', permissionsSelect?.id);
+    console.log('Name du select:', permissionsSelect?.name);
+    console.log('Nombre d\'options:', permissionsSelect?.options.length);
+    
+    if (permissionsSelect) {
+        // Rendre le select multiple
+        permissionsSelect.setAttribute('multiple', 'multiple');
+        
+        const permissionsContainer = document.getElementById('permissions-cards-container');
+        const searchInput = document.getElementById('permission-search');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        
+        // Fonction pour obtenir la catégorie d'une permission
+        function getPermissionCategory(text) {
+            const lowerText = text.toLowerCase();
+            if (lowerText.includes('user') || lowerText.includes('utilisateur')) return 'user';
+            if (lowerText.includes('auth') || lowerText.includes('group') || lowerText.includes('groupe')) return 'auth';
+            if (lowerText.includes('admin') || lowerText.includes('log') || lowerText.includes('historique')) return 'admin';
+            return 'autres';
+        }
+        
+        // Fonction pour extraire les infos d'une permission
+        function parsePermissionText(text) {
+            const parts = text.split('|').map(p => p.trim());
+            if (parts.length >= 3) {
+                return {
+                    app: parts[0],
+                    model: parts[1],
+                    action: parts[2],
+                    full: text
+                };
+            }
+            return {
+                app: '',
+                model: '',
+                action: text,
+                full: text
+            };
+        }
+        
+        // Fonction pour obtenir l'icône selon le type d'action
+        function getPermissionIcon(action) {
+            const lowerAction = action.toLowerCase();
+            if (lowerAction.includes('add') || lowerAction.includes('ajout')) return 'bx-plus-circle';
+            if (lowerAction.includes('change') || lowerAction.includes('modif')) return 'bx-edit';
+            if (lowerAction.includes('delete') || lowerAction.includes('supprim')) return 'bx-trash';
+            if (lowerAction.includes('view') || lowerAction.includes('voir')) return 'bx-show';
+            return 'bx-shield';
+        }
+        
+        // Créer les cartes de permissions
+        const permissionsData = [];
+        Array.from(permissionsSelect.options).forEach((option, index) => {
+            const parsed = parsePermissionText(option.text);
+            const category = getPermissionCategory(option.text);
+            const icon = getPermissionIcon(parsed.action);
+            
+            permissionsData.push({
+                value: option.value,
+                text: option.text,
+                parsed: parsed,
+                category: category,
+                icon: icon,
+                selected: option.selected,
+                element: option
+            });
+            
+            const card = document.createElement('div');
+            card.className = 'permission-item-card' + (option.selected ? ' selected' : '');
+            card.dataset.value = option.value;
+            card.dataset.category = category;
+            card.dataset.searchText = option.text.toLowerCase();
+            
+            card.innerHTML = `
+                <div class="permission-checkbox-wrapper">
+                    <i class='bx bx-check'></i>
+                </div>
+                <div class="permission-item-info">
+                    <div class="permission-item-name">
+                        <i class='bx ${icon}'></i> ${parsed.action}
+                    </div>
+                    <div class="permission-item-description">
+                        ${parsed.app} ${parsed.model ? '→ ' + parsed.model : ''}
+                    </div>
+                    <span class="permission-item-badge">${category}</span>
+                </div>
+            `;
+            
+            card.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                const isSelected = this.classList.contains('selected');
+                
+                console.log('🖱️ Clic sur carte:', {
+                    permission: this.querySelector('.permission-item-name')?.textContent.trim(),
+                    value: this.dataset.value,
+                    isSelected: isSelected
+                });
+                
+                // Mettre à jour l'option correspondante dans le select
+                let foundOption = false;
+                Array.from(permissionsSelect.options).forEach(opt => {
+                    if (opt.value === this.dataset.value) {
+                        opt.selected = isSelected;
+                        foundOption = true;
+                        console.log('✅ Option mise à jour dans le select');
+                    }
+                });
+                
+                if (!foundOption) {
+                    console.warn('⚠️ Option non trouvée dans le select pour la valeur:', this.dataset.value);
+                }
+                
+                updateSelectedCount();
+            });
+            
+            permissionsContainer.appendChild(card);
+        });
+        
+        // Mettre à jour les compteurs
+        function updateCounts() {
+            const counts = {all: 0, user: 0, auth: 0, admin: 0, autres: 0};
+            permissionsData.forEach(p => {
+                counts.all++;
+                counts[p.category]++;
+            });
+            document.getElementById('count-all').textContent = counts.all;
+            document.getElementById('count-user').textContent = counts.user;
+            document.getElementById('count-auth').textContent = counts.auth;
+            document.getElementById('count-admin').textContent = counts.admin;
+            document.getElementById('count-autres').textContent = counts.autres;
+        }
+        
+        // Mettre à jour le compteur de sélection
+        function updateSelectedCount() {
+            const selected = permissionsContainer.querySelectorAll('.permission-item-card.selected').length;
+            document.getElementById('selected-permissions-count').textContent = selected;
+        }
+        
+        updateCounts();
+        updateSelectedCount();
+        
+        // Recherche
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const cards = permissionsContainer.querySelectorAll('.permission-item-card');
+                
+                cards.forEach(card => {
+                    if (card.dataset.searchText.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Filtres
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.getAttribute('data-filter');
+                const cards = permissionsContainer.querySelectorAll('.permission-item-card');
+                
+                cards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
         });
     }
 });
+
+// ==================== FONCTIONS GLOBALES ====================
+function selectAllVisiblePermissions() {
+    const cards = document.querySelectorAll('.permission-item-card');
+    const select = document.getElementById('id_user_permissions') ||
+                   document.getElementById('id_user_permissions_to') || 
+                   document.querySelector('select[name="user_permissions"]');
+    
+    cards.forEach(card => {
+        if (card.style.display !== 'none') {
+            card.classList.add('selected');
+            const value = card.dataset.value;
+            if (select) {
+                Array.from(select.options).forEach(option => {
+                    if (option.value === value) {
+                        option.selected = true;
+                    }
+                });
+            }
+        }
+    });
+    
+    updateSelectedCount();
+}
+
+function deselectAllPermissions() {
+    const cards = document.querySelectorAll('.permission-item-card');
+    const select = document.getElementById('id_user_permissions') ||
+                   document.getElementById('id_user_permissions_to') || 
+                   document.querySelector('select[name="user_permissions"]');
+    
+    cards.forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    if (select) {
+        Array.from(select.options).forEach(option => {
+            option.selected = false;
+        });
+    }
+    
+    updateSelectedCount();
+}
+
+function invertSelection() {
+    const cards = document.querySelectorAll('.permission-item-card');
+    const select = document.getElementById('id_user_permissions') ||
+                   document.getElementById('id_user_permissions_to') || 
+                   document.querySelector('select[name="user_permissions"]');
+    
+    cards.forEach(card => {
+        if (card.style.display !== 'none') {
+            card.classList.toggle('selected');
+            const value = card.dataset.value;
+            if (select) {
+                Array.from(select.options).forEach(option => {
+                    if (option.value === value) {
+                        option.selected = card.classList.contains('selected');
+                    }
+                });
+            }
+        }
+    });
+    
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const container = document.getElementById('permissions-cards-container');
+    if (container) {
+        const selected = container.querySelectorAll('.permission-item-card.selected').length;
+        const countElement = document.getElementById('selected-permissions-count');
+        if (countElement) {
+            countElement.textContent = selected;
+        }
+    }
+}
+
+// Fonction de debug
+function debugPermissions() {
+    const select = document.getElementById('id_user_permissions');
+    const selectTo = document.getElementById('id_user_permissions_to');
+    const cards = document.querySelectorAll('.permission-item-card.selected');
+    const allCards = document.querySelectorAll('.permission-item-card');
+    
+    console.log('=== DEBUG PERMISSIONS ===');
+    console.log('Nombre total de cartes:', allCards.length);
+    console.log('Nombre de cartes sélectionnées:', cards.length);
+    
+    if (cards.length > 0) {
+        console.log('Cartes sélectionnées:', Array.from(cards).map(c => ({
+            value: c.dataset.value,
+            text: c.querySelector('.permission-item-name').textContent.trim()
+        })));
+    }
+    
+    console.log('\n--- Recherche du SELECT ---');
+    console.log('Select id_user_permissions:', select);
+    console.log('Select id_user_permissions_to:', selectTo);
+    
+    const activeSelect = select || selectTo;
+    if (activeSelect) {
+        console.log('\n--- Détails du SELECT actif ---');
+        console.log('ID:', activeSelect.id);
+        console.log('Name:', activeSelect.name);
+        console.log('Select est multiple:', activeSelect.hasAttribute('multiple'));
+        console.log('Nombre d\'options dans le select:', activeSelect.options.length);
+        console.log('Nombre d\'options sélectionnées:', activeSelect.selectedOptions.length);
+        
+        if (activeSelect.options.length > 0) {
+            console.log('\n📋 Premières 5 options du select:');
+            Array.from(activeSelect.options).slice(0, 5).forEach((o, i) => {
+                console.log(`  ${i + 1}. Value: "${o.value}" | Selected: ${o.selected} | Text: ${o.text.substring(0, 50)}`);
+            });
+        }
+        
+        if (activeSelect.selectedOptions.length > 0) {
+            console.log('\n✅ Options sélectionnées dans le select:');
+            Array.from(activeSelect.selectedOptions).forEach(o => {
+                console.log(`  - Value: "${o.value}" | Text: ${o.text.substring(0, 50)}`);
+            });
+        } else {
+            console.log('\n⚠️ Aucune option sélectionnée dans le select');
+        }
+        
+        // Comparaison des valeurs
+        if (cards.length > 0 && activeSelect.options.length > 0) {
+            console.log('\n🔍 Comparaison cartes vs options:');
+            const cardValues = Array.from(cards).map(c => c.dataset.value);
+            const selectValues = Array.from(activeSelect.options).map(o => o.value);
+            
+            console.log('Valeurs des cartes sélectionnées:', cardValues);
+            console.log('Exemple de valeurs dans le select:', selectValues.slice(0, 5));
+            
+            // Vérifier si les valeurs correspondent
+            cardValues.forEach(cardValue => {
+                const found = selectValues.includes(cardValue);
+                console.log(`  Carte value "${cardValue}": ${found ? '✅ trouvée' : '❌ NON trouvée'} dans le select`);
+            });
+        }
+    } else {
+        console.log('❌ SELECT NON TROUVÉ!');
+    }
+    
+    alert('Vérifiez la console (F12) pour les détails');
+}
 </script>
 {% endblock %}
