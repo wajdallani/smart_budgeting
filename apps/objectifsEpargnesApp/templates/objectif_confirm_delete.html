@@ -1,0 +1,52 @@
+{% extends layout_path %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Supprimer l'objectif{% endblock %}
+
+{% block content %}
+
+<div class="col-lg-6 mx-auto mt-5">
+
+  <div class="card border-danger">
+    <div class="card-header bg-danger text-white d-flex align-items-center">
+      <i class="bx bx-trash me-2 fs-4"></i>
+      <h5 class="mb-0">Supprimer l'objectif d’épargne</h5>
+    </div>
+
+    <div class="card-body">
+
+      <p class="fs-5">
+        Êtes-vous sûr de vouloir supprimer l’objectif suivant ?
+      </p>
+
+      <div class="alert alert-warning">
+        <strong>{{ object.name }}</strong><br>
+        Montant cible : {{ object.target_amount }} TND<br>
+        Date cible : {{ object.target_date|default:"Non définie" }}
+      </div>
+
+      <p class="text-muted">
+        <i class="bx bx-info-circle"></i>
+        Cette action est <strong>irréversible</strong>.
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="d-flex justify-content-between mt-4">
+          <a href="{% url 'listEpargne' %}" class="btn btn-secondary">
+            Annuler
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="bx bx-trash"></i> Supprimer définitivement
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

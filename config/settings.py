@@ -190,3 +190,5 @@ THEME_VARIABLES = THEME_VARIABLES
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+LOGIN_URL = "/auth/login/"
+LOGIN_REDIRECT_URL = "/"

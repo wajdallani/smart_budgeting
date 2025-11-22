@@ -69,7 +69,13 @@ class ObjEpargne(models.Model):
             return round((self.total_contributed / self.target_amount) * 100, 2)
         return 0
 
-
+    @property
+    def days_remaining(self):
+        if not self.target_date:
+            return None
+        today = timezone.now().date()
+        return (self.target_date - today).days
+    
 class ObjEpargneContribution(models.Model):
     cont_id = models.AutoField(primary_key=True)
     goal = models.ForeignKey(ObjEpargne, on_delete=models.CASCADE, related_name='contributions')
