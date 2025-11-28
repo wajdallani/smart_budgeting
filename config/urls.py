@@ -19,6 +19,8 @@ from django.contrib import admin
 from django.urls import include, path
 from web_project.views import SystemView
 
+from django.conf import settings  # ← Cette ligne doit être présente
+from django.conf.urls.static import static  # ← Cette ligne aussi
 urlpatterns = [
     path("admin/", admin.site.urls),
 
@@ -54,20 +56,14 @@ urlpatterns = [
 
     # Tables urls
     path("", include("apps.tables.urls")),
-    # Group App urls
-    path("group/", include("apps.groupApp.urls")),
-    # Categorie App urls
-    path("categorie/", include("apps.categorieApp.urls")),
-    # Depense App urls
-    path("depense/", include("apps.depenseApp.urls")),
-    # Revenue App urls
-    path("revenue/", include("apps.revenueApp.urls")),
-    # Dette App urls
-    path("dette/", include("apps.detteApp.urls")),
-    # Objectifs Epargnes App urls
-    path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
+    
+    path('depenses/', include('apps.depenseApp.urls')),
+
 ]
 
 handler404 = SystemView.as_view(template_name="pages_misc_error.html", status=404)
 handler400 = SystemView.as_view(template_name="pages_misc_error.html", status=400)
 handler500 = SystemView.as_view(template_name="pages_misc_error.html", status=500)
+# Configuration pour les fichiers médias
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

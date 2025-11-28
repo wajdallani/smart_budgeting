@@ -1,0 +1,60 @@
+{% extends 'layout/layout_vertical.html' %}
+{% load static %}
+
+{% block page_title %}Supprimer une Dépense{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Dépenses /</span> Supprimer
+    </h4>
+
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-danger">
+                        <i class='bx bx-error-circle'></i> Confirmation de suppression
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <span class="alert-icon text-warning me-2">
+                            <i class='bx bx-info-circle bx-sm'></i>
+                        </span>
+                        Cette action est irréversible !
+                    </div>
+
+                    <p class="mb-4">
+                        Êtes-vous sûr de vouloir supprimer cette dépense ?
+                    </p>
+
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h6 class="card-title">Détails de la dépense</h6>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2"><strong>ID:</strong> {{ depense.depense_id }}</li>
+                                <li class="mb-2"><strong>Montant:</strong> {{ depense.amount }} €</li>
+                                <li class="mb-2"><strong>Date:</strong> {{ depense.date|date:"d/m/Y" }}</li>
+                                {% if depense.notes %}
+                                    <li><strong>Notes:</strong> {{ depense.notes|truncatewords:20 }}</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger me-2">
+                            <i class='bx bx-trash'></i> Oui, supprimer
+                        </button>
+                        <a href="{% url 'depense_list' %}" class="btn btn-secondary">
+                            <i class='bx bx-x'></i> Annuler
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

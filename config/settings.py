@@ -68,7 +68,7 @@ INSTALLED_APPS = [
     "apps.form_layouts",
     "apps.tables",
     "apps.categorieApp",
-    "apps.depenseApp",
+    'apps.depenseApp',
     "apps.revenueApp",
     "apps.detteApp",
     "apps.groupApp",
