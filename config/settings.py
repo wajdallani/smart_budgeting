@@ -187,7 +187,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 THEME_LAYOUT_DIR = THEME_LAYOUT_DIR
 THEME_VARIABLES = THEME_VARIABLES
 
-
+LOGIN_URL = '/admin/login/'
+LOGIN_REDIRECT_URL = '/categorie/'
 
 # Your stuff...
 # ------------------------------------------------------------------------------
