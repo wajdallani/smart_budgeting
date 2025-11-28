@@ -1,0 +1,362 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Administration{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Cacher la navbar et sidebar Django */
+    #header {
+        display: none !important;
+    }
+
+    #nav-sidebar {
+        display: none !important;
+    }
+
+    body {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    #container {
+        display: flex !important;
+        min-height: 100vh;
+    }
+
+    .main {
+        margin-left: 0 !important;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #content {
+        margin-left: 0 !important;
+        padding: 2rem;
+        flex: 1;
+    }
+
+    .breadcrumbs {
+        padding: 1rem 2rem;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    /* Sidebar personnalisé */
+    .custom-sidebar {
+        width: 280px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+
+    .sidebar-header {
+        padding: 2rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sidebar-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 1rem 0;
+    }
+
+    .nav-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .nav-section-title {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.7;
+        margin-bottom: 0.5rem;
+    }
+
+    .nav-item {
+        display: flex;
+        padding: 0.75rem 1.5rem;
+        color: white;
+        text-decoration: none;
+        transition: all 0.2s;
+        align-items: center;
+        gap: 1rem;
+        border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-left-color: white;
+    }
+
+    .nav-item.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-left-color: white;
+        font-weight: 600;
+    }
+
+    .nav-item-icon {
+        font-size: 1.3rem;
+        width: 24px;
+        text-align: center;
+    }
+
+    .nav-item-text {
+        flex: 1;
+    }
+
+    .sidebar-footer {
+        padding: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .user-details {
+        flex: 1;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .user-role {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin: 0;
+    }
+
+    .footer-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .footer-link {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .footer-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Messages */
+    .messagelist {
+        margin: 0 0 1rem 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .messagelist li {
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+
+    .messagelist .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .messagelist .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .messagelist .warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .custom-sidebar {
+            width: 240px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.2rem;
+        }
+
+        .nav-item {
+            padding: 0.6rem 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block branding %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block userlinks %}{% endblock %}
+
+{% block content %}
+<div class="custom-sidebar">
+    <div class="sidebar-header">
+        <h1>🔐 Administration</h1>
+        <p>Gestion du système</p>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Dashboard</div>
+            <a href="{% url 'admin:userApp_user_changelist' %}" class="nav-item {% if '/userApp/user' in request.path %}active{% endif %}">
+                <span class="nav-item-icon">🏠</span>
+                <span class="nav-item-text">Accueil</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Utilisateurs</div>
+            
+            <a href="{% url 'admin:userApp_user_changelist' %}" class="nav-item {% if '/userApp/user' in request.path and '/add' not in request.path %}active{% endif %}">
+                <span class="nav-item-icon">👥</span>
+                <span class="nav-item-text">Liste utilisateurs</span>
+            </a>
+            
+            <a href="{% url 'admin:userApp_user_add' %}" class="nav-item {% if '/userApp/user/add' in request.path %}active{% endif %}">
+                <span class="nav-item-icon">➕</span>
+                <span class="nav-item-text">Ajouter utilisateur</span>
+            </a>
+
+            <a href="{% url 'admin:auth_group_changelist' %}" class="nav-item">
+                <span class="nav-item-icon">👨‍👩‍👧‍👦</span>
+                <span class="nav-item-text">Gérer groupes</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Gestion Budget</div>
+            
+            <a href="{% url 'admin:categorieApp_categorie_changelist' %}" class="nav-item">
+                <span class="nav-item-icon">📂</span>
+                <span class="nav-item-text">Catégories</span>
+            </a>
+            
+            <a href="{% url 'admin:depenseApp_depense_changelist' %}" class="nav-item">
+                <span class="nav-item-icon">💸</span>
+                <span class="nav-item-text">Dépenses</span>
+            </a>
+            
+            <a href="{% url 'admin:revenueApp_revenue_changelist' %}" class="nav-item">
+                <span class="nav-item-icon">💰</span>
+                <span class="nav-item-text">Revenus</span>
+            </a>
+            
+            <a href="{% url 'admin:detteApp_dette_changelist' %}" class="nav-item">
+                <span class="nav-item-icon">💳</span>
+                <span class="nav-item-text">Dettes</span>
+            </a>
+            
+            <a href="{% url 'admin:objectifsEpargnesApp_objectif_changelist' %}" class="nav-item">
+                <span class="nav-item-icon">🎯</span>
+                <span class="nav-item-text">Objectifs</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+                <p class="user-name">{{ user.get_full_name|default:user.email|truncatechars:20 }}</p>
+                <p class="user-role">{% if user.is_superuser %}Super Admin{% else %}Admin{% endif %}</p>
+            </div>
+        </div>
+        
+        <div class="footer-links">
+            <a href="/" class="footer-link" target="_blank">
+                <span>🌐</span> Voir le site
+            </a>
+            <a href="{% url 'admin:password_change' %}" class="footer-link">
+                <span>🔑</span> Mot de passe
+            </a>
+            <a href="{% url 'admin:logout' %}" class="footer-link">
+                <span>🚪</span> Déconnexion
+            </a>
+        </div>
+    </div>
+</div>
+
+<div style="flex: 1;">
+    {% block messages %}
+        {% if messages %}
+            <ul class="messagelist" style="margin: 1rem 2rem;">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endblock messages %}
+
+    {% block breadcrumbs %}
+        <div class="breadcrumbs">
+            <a href="{% url 'admin:userApp_user_changelist' %}">Accueil</a>
+            {% if title %} › {{ title }}{% endif %}
+        </div>
+    {% endblock %}
+
+    <div id="content">
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+        {% block object-tools %}{% endblock %}
+        {{ content }}
+    </div>
+</div>
+{% endblock %}
