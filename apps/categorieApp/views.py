@@ -6,12 +6,23 @@ from django.db.models import Q
 from .models import Categorie
 from .forms import CategorieForm
 
+from web_project import TemplateLayout  # 👈 add this
+
+# Create one instance of the layout helper
+layout = TemplateLayout()
+
 
 def page_accueil(request):
     """Page d'accueil avec choix de connexion"""
     if request.user.is_authenticated:
         return redirect('categorieApp:liste_categories')
-    return render(request, 'categorieApp/accueil.html')
+
+    context = {}
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
+    return render(request, 'categorieApp/accueil.html', context)
 
 
 def connexion_admin(request):
@@ -31,7 +42,12 @@ def connexion_admin(request):
         else:
             messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
     
-    return render(request, 'categorieApp/connexion_admin.html')
+    context = {}
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
+    return render(request, 'categorieApp/connexion_admin.html', context)
 
 
 def connexion_utilisateur(request):
@@ -48,7 +64,12 @@ def connexion_utilisateur(request):
         else:
             messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
     
-    return render(request, 'categorieApp/connexion_utilisateur.html')
+    context = {}
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
+    return render(request, 'categorieApp/connexion_utilisateur.html', context)
 
 
 def deconnexion(request):
@@ -82,6 +103,10 @@ def liste_categories(request):
         'categories_globales': categories.filter(est_globale=True),
         'mes_categories': categories.filter(utilisateur=request.user),
     }
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
     return render(request, 'categorieApp/liste_categories.html', context)
 
 
@@ -118,6 +143,10 @@ def ajouter_categorie(request):
         'titre': 'Ajouter une catégorie',
         'bouton': 'Ajouter'
     }
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
     return render(request, 'categorieApp/form_categorie.html', context)
 
 
@@ -149,6 +178,10 @@ def modifier_categorie(request, pk):
         'titre': 'Modifier la catégorie',
         'bouton': 'Modifier'
     }
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
     return render(request, 'categorieApp/form_categorie.html', context)
 
 
@@ -172,6 +205,10 @@ def supprimer_categorie(request, pk):
         return redirect('categorieApp:liste_categories')
     
     context = {'categorie': categorie}
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
     return render(request, 'categorieApp/confirmer_suppression.html', context)
 
 
@@ -186,6 +223,10 @@ def detail_categorie(request, pk):
         return redirect('categorieApp:liste_categories')
     
     context = {'categorie': categorie}
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
     return render(request, 'categorieApp/detail_categorie.html', context)
 
 
@@ -208,6 +249,10 @@ def categories_par_utilisateur(request):
         'total_categories': categories.count(),
         'nombre_utilisateurs': len(categories_par_user)
     }
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
     return render(request, 'categorieApp/categories_par_utilisateur.html', context)
 
 
@@ -220,6 +265,10 @@ def mes_categories(request):
         'categories': categories,
         'titre': 'Mes catégories personnelles'
     }
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
     return render(request, 'categorieApp/mes_categories.html', context)
 
 
@@ -232,4 +281,8 @@ def categories_globales(request):
         'categories': categories,
         'titre': 'Catégories globales'
     }
+    context = layout.init(context)
+    if not context.get("layout_path"):
+        context["layout_path"] = "layout_vertical.html"
+
     return render(request, 'categorieApp/categories_globales.html', context)
