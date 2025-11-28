@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 class Revenue(models.Model):
     CATEGORY_CHOICES = [
@@ -10,7 +11,7 @@ class Revenue(models.Model):
         ('other', 'Autre'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='revenues')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='revenues')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
     description = models.TextField(blank=True, null=True)

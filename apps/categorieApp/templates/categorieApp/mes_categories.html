@@ -1,7 +1,12 @@
-{% extends 'categorieApp/base.html' %}
+{% extends layout_path %}
 
+{% load static %}
+{% load i18n %}
 {% block title %}Mes Catégories{% endblock %}
-
+{% block vendor_js %}
+  {{ block.super }}
+  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
+{% endblock vendor_js %}
 {% block content %}
 <div class="row">
     <div class="col-md-12">

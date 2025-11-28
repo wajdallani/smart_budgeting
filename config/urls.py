@@ -55,7 +55,7 @@ urlpatterns = [
     # Tables urls
     path("", include("apps.tables.urls")),
     # Group App urls
-    path("group/", include("apps.groupApp.urls")),
+    # path("group/", include("apps.groupApp.urls")),
     # Categorie App urls
     path("categorie/", include("apps.categorieApp.urls")),
     # Depense App urls
@@ -63,7 +63,7 @@ urlpatterns = [
     # Revenue App urls
     path("revenue/", include("apps.revenueApp.urls")),
     # Dette App urls
-    path("dette/", include("apps.detteApp.urls")),
+    # path("dette/", include("apps.detteApp.urls")),
     # Objectifs Epargnes App urls
     path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
 ]
