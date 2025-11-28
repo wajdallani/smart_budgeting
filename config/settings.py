@@ -179,7 +179,7 @@ BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
+AUTH_USER_MODEL = 'userApp.User'
 # Template Settings
 # ------------------------------------------------------------------------------
 
