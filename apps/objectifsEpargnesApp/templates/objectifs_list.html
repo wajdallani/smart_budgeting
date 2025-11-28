@@ -1,0 +1,159 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Mes objectifs d'épargne{% endblock %}
+
+{% block vendor_js %}
+  {{ block.super }}
+  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+
+{% comment %} <h1>Mes objectifs d'épargne</h1>
+<a href="{% url 'createEpargne' %}">+ Nouvel objectif</a>
+
+<ul>
+  {% for obj in objectifs %}
+    <li>
+      <a href="{% url 'epargne:detail' obj.pk %}">
+        {{ obj.name }} - {{ obj.total_contributed }}/{{ obj.target_amount }} ({{ obj.progress_percentage }}%)
+      </a>
+      <a href="{% url 'editEpargne' obj.pk %}">Update</a>
+      <a href="{% url 'deleteEpargne' obj.pk %}">Delete</a>
+      <a href="{% url 'detailEpargne' obj.pk %}">Details</a>
+    </li>
+
+  {% empty %}
+    <li>Aucun objectif pour le moment.</li>
+  {% endfor %}
+</ul> {% endcomment %}
+
+<style>
+  /* Soft clean iOS style */
+  .goal-card {
+    border-radius: 18px !important;
+    background: #ffffff;
+    border: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    transition: transform .2s ease;
+  }
+  .goal-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.10);
+  }
+  .goal-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: #e8f8ed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .goal-progress {
+    height: 8px !important;
+    border-radius: 10px;
+  }
+  .goal-progress-bar {
+    background-color: #46c268 !important;
+    border-radius: 10px;
+  }
+  .chevron-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+<div class="container-xxl mt-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0 fw-bold">Mes objectifs d'épargne</h3>
+    <a href="{% url 'createEpargne' %}" class="btn btn-primary rounded-pill px-4">
+      + Nouvel objectif
+    </a>
+  </div>
+
+  <div class="row g-4">
+
+    {% for obj in objectifs %}
+      <div class="col-md-6 col-xl-4">
+
+        <div class="card goal-card p-5">
+
+          <!-- Header: icon + name + chevron -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div class="d-flex align-items-center gap-3">
+              <div class="goal-icon">
+                <i class="bx bx-bullseye fs-3 text-success"></i>
+              </div>
+              <h5 class="mb-0 fw-semibold text-truncate" style="max-width: 11rem;">
+                {{ obj.name }}
+              </h5>
+            </div>
+
+            <a href="{% url 'detailEpargne' obj.pk %}" class="chevron-btn">
+              <i class="bx bx-chevron-right fs-3 text-muted"></i>
+            </a>
+
+          </div>
+
+          <!-- Amount summary -->
+          <div class="d-flex justify-content-between mb-2">
+            <span class="fw-bold">{{ obj.total_contributed }} TND</span>
+            <span class="text-muted">{{ obj.target_amount }} TND</span>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress goal-progress mb-2">
+            <div class="progress-bar goal-progress-bar"
+                 role="progressbar"
+                 style="width: {{ obj.progress_percentage }}%;">
+            </div>
+          </div>
+
+          <!-- Days & percentage -->
+          <div class="d-flex justify-content-between small">
+            <span class="text-muted">
+              {% if obj.target_date %}
+                {% if obj.days_remaining > 1 %}
+                  {{ obj.days_remaining }} jours restants
+                {% elif obj.days_remaining == 1 %}
+                  1 jour restant
+                {% elif obj.days_remaining == 0 %}
+                  Dernier jour 🎯
+                {% else %}
+                  Échéance dépassée
+                {% endif %}
+              {% else %}
+                Pas de date limite
+              {% endif %}
+            </span>
+            <span class="fw-bold">{{ obj.progress_percentage }}%</span>
+          </div>
+
+        </div>
+
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info">
+          Aucun objectif pour le moment. Commencez par en créer un !
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+
+</div>
+
+
+{% endblock %}
