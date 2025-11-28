@@ -1,0 +1,127 @@
+{% extends "layout/layout_blank.html" %}
+{% load static i18n %}
+
+{% block title %}Connexion Administrateur{% endblock %}
+
+{% block page_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'vendor/css/pages/page-auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-xxl">
+  <div class="authentication-wrapper authentication-basic container-p-y">
+    <div class="authentication-inner">
+
+      {# ========================================= #}
+      {# 1. ACCÈS REFUSÉ (connecté mais pas admin) #}
+      {# ========================================= #}
+      {% if access_denied %}
+        <div class="card px-sm-6 px-0">
+          <div class="card-body text-center py-8">
+            <i class="bx bx-lock-open-alt text-danger mb-4" style="font-size: 5rem;"></i>
+            <h3 class="mb-4">Accès refusé</h3>
+            <p class="mb-5 text-muted lead">
+              Bonjour <strong>{{ user.get_full_name|default:user.email }}</strong>,<br><br>
+              Votre compte possède le rôle <strong class="text-danger">{{ user.role|capfirst }}</strong>.<br>
+              Seul le rôle <strong>Administrateur</strong> est autorisé à accéder à cet espace.
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+              <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                <i class="bx bx-log-out me-2"></i> Se déconnecter
+              </a>
+              <a href="/" class="btn btn-primary">
+                <i class="bx bx-home me-2"></i> Retour à l'accueil
+              </a>
+            </div>
+          </div>
+        </div>
+
+      {# ========================================= #}
+      {# 2. FORMULAIRE DE CONNEXION (normal)      #}
+      {# ========================================= #}
+      {% else %}
+        <div class="card px-sm-6 px-0">
+          <div class="card-body">
+
+            <!-- Logo -->
+            <div class="app-brand justify-content-center mb-6">
+              <a href="{% url 'index' %}" class="app-brand-link gap-2">
+                <span class="app-brand-logo demo">{% include 'partials/logo.html' %}</span>
+                <span class="app-brand-text demo text-heading fw-bold">
+                  {% get_theme_variables 'template_name' %}
+                </span>
+              </a>
+            </div>
+
+            <h4 class="mb-2 text-center">Espace Administrateur</h4>
+            <p class="mb-6 text-center text-muted">Réservé aux administrateurs uniquement.</p>
+
+            {# ←←← AFFICHAGE DES MESSAGES DJANGO (CRUCIAL !) ←←← #}
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show mb-4" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="post" class="mb-6">
+              {% csrf_token %}
+
+              <div class="mb-4">
+                <label class="form-label">Email</label>
+                <input type="email" name="username" class="form-control" 
+                       value="{{ email|default:'' }}" placeholder="admin@votre-site.com" required autofocus>
+              </div>
+
+              <div class="mb-5 form-password-toggle">
+                <label class="form-label">Mot de passe</label>
+                <div class="input-group input-group-merge">
+                  <input type="password" name="password" class="form-control" 
+                         placeholder="············" required>
+                  <span class="input-group-text cursor-pointer">
+                    <i class="bx bx-hide"></i>
+                  </span>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary d-grid w-100">
+                Se connecter
+              </button>
+            </form>
+
+            <div class="text-center mt-4">
+              <small class="text-muted">
+                <i class="bx bx-info-circle"></i> Connexion réservée aux comptes avec le rôle <strong>Administrateur</strong>.
+              </small>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+  {{ block.super }}
+  <script>
+    // Toggle mot de passe (parfaitement fonctionnel)
+    document.querySelectorAll('.form-password-toggle .input-group-text').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = btn.previousElementSibling;
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.replace('bx-hide', 'bx-show');
+        } else {
+          input.type = 'password';
+          icon.classList.replace('bx-show', 'bx-hide');
+        }
+      });
+    });
+  </script>
+{% endblock %}
