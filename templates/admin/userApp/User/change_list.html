@@ -1,0 +1,1315 @@
+{% extends "admin/change_list.html" %}
+{% load static i18n %}
+
+{# On enlève le titre par défaut "Sélectionnez l'objet..." #}
+{% block content_title %}{% endblock %}
+
+{# On rend les messages Django (ils seront ensuite lus par le JS) #}
+{% block messages %}
+  {% if messages %}
+    <ul class="messagelist">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+
+{# === CSS DU THÈME === #}
+<link rel="stylesheet" href="{% static 'vendor/css/core.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/css/theme-default.css' %}">
+<link rel="stylesheet" href="{% static 'css/demo.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/fonts/boxicons.css' %}">
+
+<style>
+    /* ============================================
+       RESET & BASE
+    ============================================ */
+    #header,
+    #nav-sidebar,
+    .breadcrumbs,
+    #toggle-nav-sidebar,
+    #changelist {
+        display: none !important;
+    }
+
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #f5f5f9;
+        font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    #content {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* ============================================
+       LAYOUT STRUCTURE
+    ============================================ */
+    .layout-wrapper {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    .layout-container {
+        display: flex;
+        flex: 1;
+    }
+
+    .layout-page {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 2rem 0;
+    }
+
+    .content-inner {
+        max-width: 1440px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    /* ============================================
+       PAGE HEADER - AMÉLIORÉ
+    ============================================ */
+    .page-header {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-header-left h4 {
+        font-weight: 600;
+        color: #566a7f;
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+    }
+
+    .page-header-left p {
+        color: #a1acb8;
+        margin: 0;
+        font-size: 0.9375rem;
+    }
+
+    .page-stats {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-value {
+        display: block;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #696cff;
+        line-height: 1;
+    }
+
+    .stat-label {
+        display: block;
+        font-size: 0.75rem;
+        color: #a1acb8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.25rem;
+    }
+
+    /* ============================================
+       STATS CARDS
+    ============================================ */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 6px rgba(67, 89, 113, 0.12);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 89, 113, 0.18);
+    }
+
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .stat-icon.success {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+        color: white;
+    }
+
+    .stat-icon.warning {
+        background: linear-gradient(135deg, #f09819 0%, #edde5d 100%);
+        color: white;
+    }
+
+    .stat-icon.danger {
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        color: white;
+    }
+
+    .stat-content h3 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #566a7f;
+        line-height: 1;
+    }
+
+    .stat-content p {
+        margin: 0.25rem 0 0;
+        font-size: 0.875rem;
+        color: #a1acb8;
+    }
+
+    .stat-trend {
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+
+    .stat-trend.up {
+        color: #28c76f;
+    }
+
+    .stat-trend.down {
+        color: #ff4c51;
+    }
+
+    /* ============================================
+       SEARCH & FILTERS
+    ============================================ */
+    .search-add-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .search-filters {
+        display: flex;
+        gap: 1rem;
+        flex: 1;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.75rem;
+        border: 1px solid #d9dee3;
+        border-radius: 0.5rem;
+        font-size: 0.9375rem;
+        background: #fff;
+        transition: all 0.2s;
+    }
+
+    .search-box input:focus {
+        border-color: #696cff;
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.15);
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a1acb8;
+        font-size: 1.25rem;
+    }
+
+    .filter-dropdown {
+        position: relative;
+    }
+
+    .filter-btn {
+        padding: 0.75rem 1.25rem;
+        background: white;
+        color: #566a7f;
+        border: 1px solid #d9dee3;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .filter-btn:hover {
+        border-color: #696cff;
+        color: #696cff;
+    }
+
+    .btn-add-user {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(105, 108, 255, 0.3);
+    }
+        .btn-add-user:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(105, 108, 255, 0.4);
+        color: white;
+    }
+    .btn-add-user,
+    .btn-add-user:hover,
+    .btn-add-user:focus,
+    .btn-add-user:active {
+        color: white !important;
+        text-decoration: none !important;
+    }
+    .btn-add-user i {
+        color: white !important;
+    }
+    .users-card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 6px rgba(67, 89, 113, 0.12);
+        overflow: hidden;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .users-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .users-table thead th {
+        background: linear-gradient(180deg, #fafbfc 0%, #f5f6f8 100%);
+        padding: 1.125rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.8125rem;
+        color: #566a7f;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e7e7ff;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    .users-table tbody td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f0f0f5;
+    }
+
+    .users-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .users-table tbody tr {
+        transition: all 0.2s;
+    }
+
+    .users-table tbody tr:hover {
+        background: #f9fafb;
+        box-shadow: inset 4px 0 0 #696cff;
+    }
+
+    /* ============================================
+       USER INFO
+    ============================================ */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .user-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.125rem;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(105, 108, 255, 0.3);
+    }
+
+    .user-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: #566a7f;
+        font-size: 0.9375rem;
+    }
+
+    .user-email {
+        font-size: 0.8125rem;
+        color: #a1acb8;
+    }
+
+    /* ============================================
+       BADGES
+    ============================================ */
+    .badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        white-space: nowrap;
+    }
+
+    .badge-admin {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(105, 108, 255, 0.3);
+    }
+
+    .badge-staff {
+        background: linear-gradient(135deg, #f09819 0%, #edde5d 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(255, 171, 0, 0.3);
+    }
+
+    .badge-user {
+        background: #e7e7ff;
+        color: #696cff;
+    }
+
+    .badge-active {
+        background: #d4f4dd;
+        color: #28c76f;
+    }
+
+    .badge-inactive {
+        background: #ffe0db;
+        color: #ff4c51;
+    }
+
+    /* ============================================
+       ACTION BUTTONS
+    ============================================ */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.375rem;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        white-space: nowrap;
+        color: white !important;
+    }
+
+    .btn-edit {
+        background: #696cff;
+    }
+
+    .btn-edit:hover {
+        background: #5f61e6;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(105, 108, 255, 0.3);
+    }
+
+    .btn-deactivate {
+        background: #dc1d1dff;
+    }
+
+    .btn-deactivate:hover {
+        background: #d50909ff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(255, 159, 67, 0.3);
+    }
+
+    .btn-activate {
+        background: #28c76f;
+    }
+
+    .btn-activate:hover {
+        background: #22a55d;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(40, 199, 111, 0.3);
+    }
+
+    /* ============================================
+       PAGINATION
+    ============================================ */
+    .pagination-wrapper {
+        padding: 1.5rem;
+        border-top: 1px solid #f0f0f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        background: #fafbfc;
+    }
+
+    .pagination-info {
+        color: #a1acb8;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    /* ============================================
+       EMPTY STATE
+    ============================================ */
+    .no-users {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #a1acb8;
+    }
+
+    .no-users .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.3;
+        display: inline-block;
+    }
+
+    .no-users h4 {
+        color: #566a7f;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .no-users p {
+        margin: 0;
+        font-size: 0.9375rem;
+    }
+
+    /* ==================== MODAL ALERTS ==================== */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-alert {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 0;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+    }
+
+    .modal-icon-container {
+        padding: 2.5rem 2rem 1.5rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .modal-icon-wrapper {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .modal-icon-wrapper.success {
+        background: linear-gradient(135deg, #d4f4dd 0%, #b7f0c3 100%);
+    }
+
+    .modal-icon-wrapper.error {
+        background: linear-gradient(135deg, #ffe0db 0%, #ffc9c0 100%);
+    }
+
+    .modal-icon-wrapper.warning {
+        background: linear-gradient(135deg, #fff4e6 0%, #ffe8cc 100%);
+    }
+
+    .modal-icon {
+        font-size: 3.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .modal-icon.success {
+        color: #28c76f;
+        animation: successPop 0.5s ease 0.2s backwards;
+    }
+
+    .modal-icon.error {
+        color: #ff4c51;
+        animation: errorShake 0.5s ease 0.2s backwards;
+    }
+
+    .modal-icon.warning {
+        color: #ff9f43;
+        animation: warningPulse 0.5s ease 0.2s backwards;
+    }
+
+    @keyframes successPop {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.2);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes errorShake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        20%, 60% {
+            transform: translateX(-10px);
+        }
+        40%, 80% {
+            transform: translateX(10px);
+        }
+    }
+
+    @keyframes warningPulse {
+        0% {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .confetti {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        opacity: 0;
+    }
+
+    .modal-icon-wrapper.success .confetti {
+        animation: confettiFall 1s ease-out forwards;
+    }
+
+    .confetti:nth-child(1) { background: #56ab2f; top: 20%; left: 10%; animation-delay: 0s; }
+    .confetti:nth-child(2) { background: #a8e063; top: 30%; left: 20%; animation-delay: 0.1s; }
+    .confetti:nth-child(3) { background: #667eea; top: 25%; right: 15%; animation-delay: 0.2s; }
+    .confetti:nth-child(4) { background: #764ba2; top: 35%; right: 25%; animation-delay: 0.15s; }
+    .confetti:nth-child(5) { background: #f09819; top: 40%; left: 30%; animation-delay: 0.25s; }
+    .confetti:nth-child(6) { background: #edde5d; top: 45%; right: 30%; animation-delay: 0.3s; }
+
+    @keyframes confettiFall {
+        0% {
+            opacity: 1;
+            transform: translateY(0) rotate(0deg);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(100px) rotate(720deg);
+        }
+    }
+
+    .modal-content {
+        padding: 0 2rem 1.5rem;
+        text-align: center;
+    }
+
+    .modal-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .modal-message {
+        font-size: 1rem;
+        color: #718096;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .modal-footer {
+        padding: 1.5rem 2rem 2rem;
+        text-align: center;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .modal-btn {
+        padding: 1rem 2.5rem;
+        border: none;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        min-width: 140px;
+        color: #000000 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-btn.success {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    }
+
+    .modal-btn.success:hover {
+        background: linear-gradient(135deg, #4a9527 0%, #95c956 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(86, 171, 47, 0.4);
+    }
+
+    .modal-btn.error {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+    }
+
+    .modal-btn.error:hover {
+        background: linear-gradient(135deg, #ff5252 0%, #ff6e6e 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    .modal-btn.warning {
+        background: linear-gradient(135deg, #ff9f43 0%, #ffb976 100%);
+    }
+
+    .modal-btn.warning:hover {
+        background: linear-gradient(135deg, #ff8510 0%, #ffa043 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 159, 67, 0.4);
+    }
+
+    .modal-btn.secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #e2e8f0 100%);
+        color: #4a5568 !important;
+    }
+
+    .modal-btn.secondary:hover {
+        background: linear-gradient(135deg, #a0aec0 0%, #cbd5e0 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(160, 174, 192, 0.4);
+    }
+
+    /* Messages Django cachés - on utilise les modales
+       → on cache seulement la liste, pas la classe .success globale */
+    ul.messagelist,
+    ul.messagelist li {
+        display: none !important;
+    }
+
+    /* ============================================
+       RESPONSIVE
+    ============================================ */
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header {
+            flex-direction: column;
+        }
+
+        .search-add-bar {
+            flex-direction: column;
+        }
+
+        .search-filters {
+            width: 100%;
+        }
+
+        .search-box {
+            min-width: 100%;
+        }
+
+        .btn-add-user {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .users-table {
+            font-size: 0.875rem;
+        }
+
+        .users-table thead th,
+        .users-table tbody td {
+            padding: 0.875rem 1rem;
+        }
+
+        .modal-footer {
+            flex-direction: column;
+        }
+
+        .modal-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Modal Alert Container -->
+<div class="modal-overlay" id="alertModal">
+    <div class="modal-alert">
+        <div class="modal-icon-container">
+            <div class="modal-icon-wrapper" id="modalIconWrapper">
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <i class="bx modal-icon" id="modalIcon"></i>
+            </div>
+        </div>
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <p class="modal-message" id="modalMessage"></p>
+        </div>
+        <div class="modal-footer" id="modalFooter">
+            <button class="modal-btn" id="modalButton" onclick="closeModal()"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmation -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-alert">
+        <div class="modal-icon-container">
+            <div class="modal-icon-wrapper warning">
+                <i class="bx bx-error-circle modal-icon warning"></i>
+            </div>
+        </div>
+        <div class="modal-content">
+            <h3 class="modal-title" id="confirmTitle"></h3>
+            <p class="modal-message" id="confirmMessage"></p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn secondary" onclick="closeConfirmModal()">Annuler</button>
+            <button class="modal-btn warning" id="confirmButton"></button>
+        </div>
+    </div>
+</div>
+
+<div class="layout-wrapper layout-content-navbar">
+  <div class="layout-container">
+
+    {# SIDEBAR PERSONNALISÉ #}
+    {% include "layout/partials/menu/vertical/vertical_menu.html" %}
+
+    <div class="layout-page">
+
+      {# NAVBAR #}
+      {% include "layout/partials/navbar/navbar.html" %}
+
+      <div class="content-wrapper">
+        <div class="content-inner">
+          <div class="user-management-container">
+
+            <!-- Page Header -->
+            <div class="page-header">
+              <div class="page-header-left">
+                <h4>
+                  <span style="color: #a1acb8;">Administration /</span> Gestion des Utilisateurs
+                </h4>
+                <p>Gérez les comptes utilisateurs, leurs permissions et leur activité</p>
+              </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon primary">
+                  <i class="bx bx-user"></i>
+                </div>
+                <div class="stat-content">
+                  <h3>{{ cl.result_count }}</h3>
+                  <p>Total Utilisateurs</p>
+                  <span class="stat-trend up">↑ 12% ce mois</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon success">
+                  <i class="bx bx-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                  <h3>{{ active_count|default:"0" }}</h3>
+                  <p>Comptes Actifs</p>
+                  <span class="stat-trend up">↑ 8% ce mois</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon warning">
+                  <i class="bx bx-star"></i>
+                </div>
+                <div class="stat-content">
+                  <h3>{{ admin_count|default:"0" }}</h3>
+                  <p>Administrateurs</p>
+                  <span class="stat-trend">→ Stable</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon danger">
+                  <i class="bx bx-time"></i>
+                </div>
+                <div class="stat-content">
+                  <h3>{{ new_users_today|default:"0" }}</h3>
+                  <p>Nouveaux Aujourd'hui</p>
+                  <span class="stat-trend up">↑ 3 dernières 24h</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="search-add-bar">
+              <div class="search-filters">
+                <div class="search-box">
+                  <i class="bx bx-search"></i>
+                  <input type="text"
+                         id="searchbar"
+                         placeholder="Rechercher par nom, email..."
+                         value="{{ cl.query }}">
+                </div>
+                <div class="filter-dropdown">
+                  <button class="filter-btn">
+                    <i class="bx bx-filter"></i>
+                    Filtres
+                  </button>
+                </div>
+              </div>
+              <a href="{% url 'admin:userApp_user_add' %}" class="btn-add-user">
+                <i class="bx bx-plus"></i>
+                Ajouter un utilisateur
+              </a>
+            </div>
+
+            <!-- Users Table -->
+            <div class="users-card">
+              <div class="table-responsive">
+                <table class="users-table">
+                  <thead>
+                    <tr>
+                      <th>Utilisateur</th>
+                      <th>Email</th>
+                      <th>Rôle</th>
+                      <th>Statut</th>
+                      <th>Date d'inscription</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for user in cl.result_list %}
+                    <tr>
+                      <td>
+                        <div class="user-info">
+                          <div class="user-avatar">
+                            {{ user.email.0|upper }}
+                          </div>
+                          <div class="user-details">
+                            <span class="user-name">
+                              {{ user.firstname|default:user.email }} {{ user.lastname|default:"" }}
+                            </span>
+                            <span class="user-email">{{ user.email }}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span style="color: #a1acb8; font-size: 0.875rem;">
+                          {{ user.email }}
+                        </span>
+                      </td>
+                      <td>
+                        {% if user.is_superuser %}
+                          <span class="badge badge-admin">
+                            <i class="bx bxs-crown"></i>
+                            Administrateur
+                          </span>
+                        {% elif user.is_staff %}
+                          <span class="badge badge-staff">
+                            <i class="bx bxs-star"></i>
+                            Staff
+                          </span>
+                        {% else %}
+                          <span class="badge badge-user">
+                            <i class="bx bx-user"></i>
+                            Utilisateur
+                          </span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if user.is_active %}
+                          <span class="badge badge-active">
+                            <i class="bx bx-check"></i>
+                            Actif
+                          </span>
+                        {% else %}
+                          <span class="badge badge-inactive">
+                            <i class="bx bx-x"></i>
+                            Inactif
+                          </span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <span style="color: #566a7f; font-weight: 500;">
+                          {{ user.date_joined|date:"d/m/Y" }}
+                        </span>
+                        <br>
+                        <span style="color: #a1acb8; font-size: 0.75rem;">
+                          {{ user.date_joined|date:"H:i" }}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="action-buttons">
+                          <a href="{% url 'admin:userApp_user_change' user.pk %}" 
+                             class="btn-action btn-edit"
+                             title="Modifier">
+                            <i class="bx bx-edit"></i>
+                            Modifier
+                          </a>
+                          {% if user.is_active %}
+                          <button class="btn-action btn-deactivate"
+                                  onclick="showDeactivateConfirm({{ user.pk }}, '{{ user.email|escapejs }}')"
+                                  title="Désactiver le compte">
+                            <i class="bx bx-block"></i>
+                            Désactiver
+                          </button>
+                          {% else %}
+                          <button class="btn-action btn-activate"
+                                  onclick="showActivateConfirm({{ user.pk }}, '{{ user.email|escapejs }}')"
+                                  title="Activer le compte">
+                            <i class="bx bx-check-circle"></i>
+                            Activer
+                          </button>
+                          {% endif %}
+                        </div>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="6">
+                        <div class="no-users">
+                          <div class="empty-icon">
+                            <i class="bx bx-group"></i>
+                          </div>
+                          <h4>Aucun utilisateur trouvé</h4>
+                          <p>Commencez par ajouter votre premier utilisateur pour gérer votre plateforme</p>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+
+              {% if cl.result_list %}
+              <div class="pagination-wrapper">
+                <div class="pagination-info">
+                  <i class="bx bx-data"></i>
+                  Affichage de <strong>{{ cl.result_count }}</strong> utilisateur{{ cl.result_count|pluralize }}
+                </div>
+              </div>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Formulaire caché pour la désactivation/activation -->
+<form id="toggleStatusForm" method="post" style="display: none;">
+  {% csrf_token %}
+  <input type="hidden" name="user_id" id="toggleUserId">
+  <input type="hidden" name="action" id="toggleAction">
+</form>
+
+
+<script>
+  // Variables globales
+  let currentUserId = null;
+  let currentUserEmail = null;
+  let currentAction = null;
+
+  // Modal Alert (succès / erreur)
+  function showAlert(type, title, message, buttonText = 'OK') {
+      const modal = document.getElementById('alertModal');
+      const iconWrapper = document.getElementById('modalIconWrapper');
+      const icon = document.getElementById('modalIcon');
+      const titleEl = document.getElementById('modalTitle');
+      const messageEl = document.getElementById('modalMessage');
+      const button = document.getElementById('modalButton');
+
+      // Reset
+      iconWrapper.className = 'modal-icon-wrapper';
+      icon.className = 'bx modal-icon';
+      button.className = 'modal-btn';
+
+      if (type === 'success') {
+          iconWrapper.classList.add('success');
+          icon.classList.add('bx-check-circle', 'success');
+          button.classList.add('success');
+      } else {
+          iconWrapper.classList.add('error');
+          icon.classList.add('bx-error-circle', 'error');
+          button.classList.add('error');
+      }
+
+      titleEl.textContent = title;
+      messageEl.textContent = message;
+      button.textContent = buttonText;
+
+      modal.classList.add('active');
+  }
+
+  function closeModal() {
+      document.getElementById('alertModal').classList.remove('active');
+  }
+
+  // Modal de confirmation
+  function showConfirm(title, message, buttonText, onConfirm) {
+      const modal = document.getElementById('confirmModal');
+      const titleEl = document.getElementById('confirmTitle');
+      const messageEl = document.getElementById('confirmMessage');
+      const button = document.getElementById('confirmButton');
+
+      titleEl.textContent = title;
+      messageEl.textContent = message;
+      button.textContent = buttonText;
+
+      // On recrée le bouton pour supprimer les anciens listeners
+      const newButton = button.cloneNode(true);
+      button.parentNode.replaceChild(newButton, button);
+      newButton.addEventListener('click', () => {
+          closeConfirmModal();
+          onConfirm();
+      });
+
+      modal.classList.add('active');
+  }
+
+  function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.remove('active');
+  }
+
+  // Confirmations d'activation / désactivation
+  function showDeactivateConfirm(userId, userEmail) {
+      currentUserId = userId;
+      currentUserEmail = userEmail;
+      currentAction = 'deactivate';
+
+      showConfirm(
+          'Désactiver le compte',
+          `Voulez-vous vraiment désactiver le compte de ${userEmail} ? L’utilisateur ne pourra plus se connecter.`,
+          'Désactiver',
+          confirmToggleStatus
+      );
+  }
+
+  function showActivateConfirm(userId, userEmail) {
+      currentUserId = userId;
+      currentUserEmail = userEmail;
+      currentAction = 'activate';
+
+      showConfirm(
+          'Activer le compte',
+          `Voulez-vous vraiment activer le compte de ${userEmail} ? L’utilisateur pourra se connecter à nouveau.`,
+          'Activer',
+          confirmToggleStatus
+      );
+  }
+
+  // Action finale (AJAX)
+  function confirmToggleStatus() {
+      document.getElementById('toggleUserId').value = currentUserId;
+      document.getElementById('toggleAction').value = currentAction;
+
+      const formData = new FormData(document.getElementById('toggleStatusForm'));
+
+      fetch(window.location.href, {
+          method: 'POST',
+          body: formData,
+          headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+          }
+      })
+      .then(r => r.json())
+      .then(data => {
+          if (data.success) {
+              showAlert('success', 'Succès', data.message, 'OK');
+              setTimeout(() => location.reload(), 1800);
+          } else {
+              showAlert('error', 'Erreur', data.message || 'Une erreur est survenue', 'Fermer');
+          }
+      })
+      .catch(() => {
+          showAlert('error', 'Erreur', 'Erreur de communication avec le serveur', 'Fermer');
+      });
+  }
+
+  // Fermer les modals en cliquant dehors
+  document.getElementById('alertModal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeModal();
+  });
+  document.getElementById('confirmModal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeConfirmModal();
+  });
+
+  // Au chargement de la page
+  document.addEventListener('DOMContentLoaded', function() {
+      // Messages Django → modale stylée
+      const successMsg = document.querySelector('ul.messagelist li.success');
+      const errorMsg = document.querySelector('ul.messagelist li.error');
+
+      if (successMsg) {
+          showAlert('success', 'Succès', successMsg.textContent.trim(), 'Super !');
+      } else if (errorMsg) {
+          showAlert('error', 'Erreur', errorMsg.textContent.trim(), 'OK');
+      }
+
+      // Recherche rapide avec Entrée
+      const searchbar = document.getElementById('searchbar');
+      if (searchbar) {
+          searchbar.addEventListener('keyup', function(e) {
+              if (e.key === 'Enter') {
+                  const val = this.value.trim();
+                  const url = new URL(window.location);
+                  if (val) {
+                      url.searchParams.set('q', val);
+                  } else {
+                      url.searchParams.delete('q');
+                  }
+                  window.location = url;
+              }
+          });
+      }
+  });
+</script>
+{% endblock %}

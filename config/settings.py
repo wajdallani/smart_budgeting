@@ -190,3 +190,6 @@ THEME_VARIABLES = THEME_VARIABLES
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'auth-login-basic'
+LOGIN_URL = 'auth-login-basic'
