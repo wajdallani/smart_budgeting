@@ -16,9 +16,9 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path, include
 from web_project.views import SystemView
-
+from django.contrib import admin
 urlpatterns = [
     path("admin/", admin.site.urls),
 
@@ -54,6 +54,7 @@ urlpatterns = [
 
     # Tables urls
     path("", include("apps.tables.urls")),
+    path('admin/', admin.site.urls),
     # Group App urls
     path("group/", include("apps.groupApp.urls")),
     # Categorie App urls
