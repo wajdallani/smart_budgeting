@@ -1,0 +1,129 @@
+{% extends 'layout/layout_vertical.html' %}
+{% load static %}
+
+{% block page_title %}Liste des Dépenses{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Gestion /</span> Dépenses
+    </h4>
+
+    <!-- Bouton Ajouter -->
+    <div class="mb-3">
+        <a href="{% url 'depense_create' %}" class="btn btn-primary">
+            <i class='bx bx-plus'></i> Nouvelle Dépense
+        </a>
+    </div>
+
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <!-- Nombre de dépenses -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="card-info">
+                            <p class="card-text">Nombre de Dépenses</p>
+                            <div class="d-flex align-items-end mb-2">
+                                <h4 class="card-title mb-0 me-2">
+                                    {{ depenses|length }}
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="card-icon">
+                            <span class="badge bg-label-info rounded p-2">
+                                <i class='bx bx-receipt bx-sm'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total des dépenses -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="card-info">
+                            <p class="card-text">Total des Dépenses</p>
+                            <div class="d-flex align-items-end mb-2">
+                                <h3 class="card-title mb-0 me-2 text-primary">
+                                    {{ total_depenses|floatformat:2 }} €
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="card-icon">
+                            <span class="badge bg-label-primary rounded p-2">
+                                <i class='bx bx-euro bx-sm'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table des dépenses -->
+    <div class="card">
+        <h5 class="card-header">Liste des Dépenses</h5>
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Montant</th>
+                        <th>Date</th>
+                        <th>Notes</th>
+                        <th>Facture</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                    {% for depense in depenses %}
+                    <tr>
+                        <td><span class="badge bg-label-primary me-1">{{ depense.amount }} €</span></td>
+                        <td>{{ depense.date|date:"d/m/Y" }}</td>
+                        <td>{{ depense.notes|truncatewords:10|default:"—" }}</td>
+                        <td>
+                            {% if depense.facture_img %}
+                                <i class='bx bx-check-circle text-success'></i>
+                            {% else %}
+                                <i class='bx bx-x-circle text-danger'></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'depense_detail' depense.depense_id %}">
+                                        <i class="bx bx-show me-1"></i> Voir
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'depense_update' depense.depense_id %}">
+                                        <i class="bx bx-edit-alt me-1"></i> Modifier
+                                    </a>
+                                    <a class="dropdown-item text-danger" href="{% url 'depense_delete' depense.depense_id %}">
+                                        <i class="bx bx-trash me-1"></i> Supprimer
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <p class="text-muted my-4">Aucune dépense trouvée</p>
+                            <a href="{% url 'depense_create' %}" class="btn btn-sm btn-primary">
+                                <i class='bx bx-plus'></i> Créer la première dépense
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
