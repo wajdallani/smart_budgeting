@@ -102,4 +102,5 @@ class AddPaymentView(CreateView):
         # A function to init the global layout. It is defined in web_project/__init__.py file
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
 
+
         return context
