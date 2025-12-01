@@ -66,7 +66,7 @@ urlpatterns = [
     # Revenue App urls
     path("revenue/", include("apps.revenueApp.urls")),
     # Dette App urls
-    # path("dette/", include("apps.detteApp.urls")),
+    path("dette/", include("apps.detteApp.urls")),
     # Objectifs Epargnes App urls
     path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
 ]
