@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator, MinLengthValidator
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 User = get_user_model()
 # Custom validators
@@ -26,7 +27,7 @@ class ObjEpargne(models.Model):
     ]
 
     goal_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saving_goals')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='saving_goals')
     name = models.CharField(
         max_length=100,
         validators=[MinLengthValidator(3, message="Le nom doit contenir au moins 3 caractères.")]

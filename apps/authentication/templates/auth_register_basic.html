@@ -28,35 +28,135 @@
             <h4 class="mb-1">Adventure starts here 🚀</h4>
             <p class="mb-6">Make your app management easy and fun!</p>
 
-            <form id="formAuthentication" class="mb-6" action="{% url 'index' %}">
+            <!-- Messages d'erreur globaux -->
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form id="formAuthentication" class="mb-6" method="post">
               {% csrf_token %}
+              
+              <!-- Prénom -->
               <div class="mb-6">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" autofocus="autofocus"/>
+                <label for="id_firstname" class="form-label">Prénom</label>
+                <input type="text" 
+                       class="form-control {% if form.firstname.errors %}is-invalid{% endif %}" 
+                       id="id_firstname" 
+                       name="firstname" 
+                       placeholder="Entrez votre prénom"
+                       value="{{ form.firstname.value|default:'' }}"
+                       autofocus
+                       required>
+                {% if form.firstname.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.firstname.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
+
+              <!-- Nom -->
               <div class="mb-6">
-                <label for="email" class="form-label">Email</label>
-                <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email"/>
+                <label for="id_lastname" class="form-label">Nom</label>
+                <input type="text" 
+                       class="form-control {% if form.lastname.errors %}is-invalid{% endif %}" 
+                       id="id_lastname" 
+                       name="lastname" 
+                       placeholder="Entrez votre nom"
+                       value="{{ form.lastname.value|default:'' }}"
+                       required>
+                {% if form.lastname.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.lastname.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
-              <div class="form-password-toggle">
-                <label class="form-label" for="password">Password</label>
+
+              <!-- Email -->
+              <div class="mb-6">
+                <label for="id_email" class="form-label">Email</label>
+                <input type="email" 
+                       class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                       id="id_email" 
+                       name="email" 
+                       placeholder="Entrez votre email"
+                       value="{{ form.email.value|default:'' }}"
+                       required>
+                {% if form.email.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.email.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Mot de passe -->
+              <div class="mb-6 form-password-toggle">
+                <label class="form-label" for="id_password">Mot de passe</label>
                 <div class="input-group input-group-merge">
-                  <input type="password" id="password" class="form-control" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password"/>
+                  <input type="password" 
+                         class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                         id="id_password" 
+                         name="password" 
+                         placeholder="············"
+                         aria-describedby="password"
+                         required>
                   <span class="input-group-text cursor-pointer">
                     <i class="icon-base bx bx-hide"></i>
                   </span>
                 </div>
+                {% if form.password.errors %}
+                  <div class="text-danger mt-1">
+                    {% for error in form.password.errors %}
+                      <small>{{ error }}</small>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                <small class="text-muted">Le mot de passe doit contenir au moins 8 caractères</small>
               </div>
-              <div class="my-7">
-                <div class="form-check mb-0">
-                  <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms"/>
-                  <label class="form-check-label" for="terms-conditions">
-                    I agree to
-                    <a href="javascript:void(0);">privacy policy & terms</a>
-                  </label>
+
+              <!-- Confirmer mot de passe -->
+              <div class="mb-6 form-password-toggle">
+                <label class="form-label" for="id_password_confirm">Confirmer le mot de passe</label>
+                <div class="input-group input-group-merge">
+                  <input type="password" 
+                         class="form-control {% if form.password_confirm.errors %}is-invalid{% endif %}" 
+                         id="id_password_confirm" 
+                         name="password_confirm" 
+                         placeholder="············"
+                         required>
+                  <span class="input-group-text cursor-pointer">
+                    <i class="icon-base bx bx-hide"></i>
+                  </span>
                 </div>
+                {% if form.password_confirm.errors %}
+                  <div class="text-danger mt-1">
+                    {% for error in form.password_confirm.errors %}
+                      <small>{{ error }}</small>
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
-              <button class="btn btn-primary d-grid w-100">Sign up</button>
+
+              <!-- Erreurs non liées à un champ spécifique -->
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                  {% for error in form.non_field_errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <button class="btn btn-primary d-grid w-100" type="submit">Sign up</button>
             </form>
 
             <p class="text-center">
@@ -71,4 +171,30 @@
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block page_js %}
+  {{ block.super }}
+  <script>
+    // Script pour afficher/masquer le mot de passe
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.form-password-toggle .input-group-text').forEach(function(element) {
+        element.addEventListener('click', function() {
+          const inputGroup = this.closest('.input-group');
+          const input = inputGroup.querySelector('input');
+          const icon = this.querySelector('i');
+          
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bx-hide');
+            icon.classList.add('bx-show');
+          } else {
+            input.type = 'password';
+            icon.classList.remove('bx-show');
+            icon.classList.add('bx-hide');
+          }
+        });
+      });
+    });
+  </script>
 {% endblock %}
