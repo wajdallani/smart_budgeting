@@ -1,0 +1,39 @@
+
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}les detailles de mon debt{% endblock %}
+
+{% block vendor_js %}
+  {{ block.super }}
+  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+  <h1>{{ debt.title }}</h1>
+  <p>Créditeur: {{ debt.creditor }}, Débiteur: {{ debt.debtor }}</p>
+  <p>Montant initial: {{ debt.original_amount }}</p>
+  <p>Restant: {{ debt.remaining_amount }}</p>
+  <p>Date d'échéance: {{ debt.due_date }}</p>
+  <a href="{% url 'detteApp:debt_edit' debt.pk %}">Modifier</a>
+  <a href="{% url 'detteApp:debt_delete' debt.pk %}">Supprimer</a>
+  <h2>Paiements</h2>
+  <a href="{% url 'detteApp:add_payment' debt.pk %}">Ajouter paiement</a>
+  <ul>
+    {% for p in debt.payments.all %}
+      <li>{{ p.date }} — {{ p.amount }} {% if p.note %}({{ p.note }}){% endif %}</li>
+    {% empty %}
+      <li>Aucun paiement enregistré.</li>
+    {% endfor %}
+  </ul>
+
+  <!-- Afficher avancement (pour 5.5) -->
+  {% if debt.original_amount %}
+    {% with paid=debt.original_amount|floatformat:2|floatformat %}
+      <!-- pour un affichage simple, on calcule % côté template approximatif -->
+    {% endwith %}
+    <p>Avancement: {{ debt.percent_paid|floatformat:2 }}%</p>
+  {% endif %}
+{% endblock %}
