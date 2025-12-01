@@ -1,0 +1,26 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Mes dettes{% endblock %}
+
+{% block vendor_js %}
+  {{ block.super }}
+  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
+{% endblock vendor_js %}
+
+
+{% block content %}
+  <h1>Dettes</h1>
+  <a href="{% url 'detteApp:debt_add' %}">Ajouter une dette</a>
+  <ul>
+    {% for d in debts %}
+      <li>
+        <a href="{{ d.get_absolute_url }}">{{ d.title }}</a> — {{ d.remaining_amount }}
+      </li>
+    {% empty %}
+      <li>Aucune dette.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
