@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class DetteappConfig(AppConfig):
+class DetteAppConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'detteApp'
+    name = 'apps.detteApp'
