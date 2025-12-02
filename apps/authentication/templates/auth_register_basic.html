@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Register - Pages{% endblock %}
+{% block title %}Inscription - Pages{% endblock %}
 
 {% block page_css %}
   {{ block.super }}
@@ -17,6 +17,7 @@
         <!-- Register Card -->
         <div class="card px-sm-6 px-0">
           <div class="card-body">
+
             <!-- Logo -->
             <div class="app-brand justify-content-center mb-6">
               <a href="{% url 'index' %}" class="app-brand-link gap-2">
@@ -25,8 +26,9 @@
               </a>
             </div>
             <!-- /Logo -->
-            <h4 class="mb-1">Adventure starts here 🚀</h4>
-            <p class="mb-6">Make your app management easy and fun!</p>
+
+            <h4 class="mb-1">L’aventure commence ici 🚀</h4>
+            <p class="mb-6">Gérez votre application facilement et efficacement !</p>
 
             <!-- Messages d'erreur globaux -->
             {% if messages %}
@@ -82,7 +84,7 @@
 
               <!-- Email -->
               <div class="mb-6">
-                <label for="id_email" class="form-label">Email</label>
+                <label for="id_email" class="form-label">Adresse email</label>
                 <input type="email" 
                        class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
                        id="id_email" 
@@ -108,7 +110,6 @@
                          id="id_password" 
                          name="password" 
                          placeholder="············"
-                         aria-describedby="password"
                          required>
                   <span class="input-group-text cursor-pointer">
                     <i class="icon-base bx bx-hide"></i>
@@ -121,7 +122,7 @@
                     {% endfor %}
                   </div>
                 {% endif %}
-                <small class="text-muted">Le mot de passe doit contenir au moins 8 caractères</small>
+                <small class="text-muted">Le mot de passe doit contenir au moins 8 caractères.</small>
               </div>
 
               <!-- Confirmer mot de passe -->
@@ -147,7 +148,7 @@
                 {% endif %}
               </div>
 
-              <!-- Erreurs non liées à un champ spécifique -->
+              <!-- Erreurs globales -->
               {% if form.non_field_errors %}
                 <div class="alert alert-danger" role="alert">
                   {% for error in form.non_field_errors %}
@@ -156,13 +157,15 @@
                 </div>
               {% endif %}
 
-              <button class="btn btn-primary d-grid w-100" type="submit">Sign up</button>
+              <button class="btn btn-primary d-grid w-100" type="submit">
+                S’inscrire
+              </button>
             </form>
 
             <p class="text-center">
-              <span>Already have an account?</span>
+              <span>Vous avez déjà un compte ?</span>
               <a href="{% url 'auth-login-basic' %}">
-                <span>Sign in instead</span>
+                <span>Se connecter</span>
               </a>
             </p>
           </div>

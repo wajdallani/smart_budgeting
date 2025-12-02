@@ -1,9 +1,13 @@
 # apps/userApp/models.py
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-from django.core.validators import EmailValidator,RegexValidator
+from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
 import re
+import random
+import string
 
 
 def validate_no_special_chars(value):
@@ -29,6 +33,8 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('role', 'admin')
+        extra_fields.setdefault('is_email_verified', True)
+        extra_fields.setdefault('is_active', True)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser doit avoir is_staff=True.')
@@ -36,24 +42,6 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser doit avoir is_superuser=True.')
 
         return self.create_user(email, password, **extra_fields)
-
-
-class AppGroup(models.Model):
-    """
-    Groupe métier (rien à voir avec les groupes de permissions Django)
-    Attributs : id, name, created_at, nb_membre
-    """
-    name = models.CharField("Nom du groupe", max_length=150, unique=True)
-    created_at = models.DateTimeField("Date de création", auto_now_add=True)
-    nb_membre = models.PositiveIntegerField("Nombre de membres", default=0)
-
-    class Meta:
-        verbose_name = "Groupe"
-        verbose_name_plural = "Groupes"
-        ordering = ["name"]
-
-    def __str__(self):
-        return self.name
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -85,16 +73,35 @@ class User(AbstractBaseUser, PermissionsMixin):
         default='utilisateur'
     )
 
-    # 🔹 Relation N-N métier User ↔ AppGroup via GroupMembre
+    is_email_verified = models.BooleanField(
+        verbose_name='Email vérifié',
+        default=False
+    )
+    email_verification_code = models.CharField(
+        verbose_name='Code de vérification',
+        max_length=6,
+        blank=True,
+        null=True
+    )
+    verification_code_created_at = models.DateTimeField(
+        verbose_name='Date de création du code',
+        blank=True,
+        null=True
+    )
+
     member_groups = models.ManyToManyField(
-        AppGroup,
+        'AppGroup',
         through='GroupMembre',
         related_name='members',
         blank=True,
         verbose_name='Groupes'
     )
     
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        verbose_name='Compte actif',
+        default=False,
+        help_text='Le compte devient actif uniquement après vérification de l\'email'
+    )
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -122,11 +129,61 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_admin(self):
         return self.role == 'admin'
 
+    def generate_verification_code(self):
+        """Génère un code de vérification à 6 chiffres"""
+        code = ''.join(random.choices(string.digits, k=6))
+        self.email_verification_code = code
+        self.verification_code_created_at = timezone.now()
+        self.save(update_fields=['email_verification_code', 'verification_code_created_at'])
+        return code
+
+    def is_verification_code_valid(self, code, expiry_minutes=10):
+        """Vérifie si le code est valide et non expiré"""
+        if not self.email_verification_code or not self.verification_code_created_at:
+            return False
+        
+        if self.email_verification_code != code:
+            return False
+        
+        expiry_time = self.verification_code_created_at + timedelta(minutes=expiry_minutes)
+        return timezone.now() <= expiry_time
+
+    def verify_email(self):
+        """
+        Marque l'email comme vérifié, active le compte et nettoie le code
+        """
+        self.is_email_verified = True
+        self.is_active = True
+        self.email_verification_code = None
+        self.verification_code_created_at = None
+        self.save(update_fields=[
+            'is_email_verified', 
+            'is_active',
+            'email_verification_code', 
+            'verification_code_created_at'
+        ])
+
+
+class AppGroup(models.Model):
+    """
+    Groupe métier
+    """
+    name = models.CharField("Nom du groupe", max_length=150, unique=True)
+    created_at = models.DateTimeField("Date de création", auto_now_add=True)
+    nb_membre = models.PositiveIntegerField("Nombre de membres", default=0)
+
+    class Meta:
+        verbose_name = "Groupe"
+        verbose_name_plural = "Groupes"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
 
 class GroupMembre(models.Model):
     """
     Table d'association entre User et AppGroup
-    + date d’adhésion
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(AppGroup, on_delete=models.CASCADE)
@@ -140,7 +197,6 @@ class GroupMembre(models.Model):
     def __str__(self):
         return f"{self.user.get_full_name()} → {self.group.name} (depuis {self.joined_at:%Y-%m-%d})"
 
-    # 🔹 Option : maintenir nb_membre automatiquement
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         super().save(*args, **kwargs)

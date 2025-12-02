@@ -16,7 +16,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from .template import  THEME_LAYOUT_DIR, THEME_VARIABLES
+from .template import THEME_LAYOUT_DIR, THEME_VARIABLES
 
 load_dotenv()  # take environment variables from .env.
 
@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.sites',
+
     "apps.dashboards",
     "apps.layouts",
     "apps.pages",
@@ -75,6 +77,8 @@ INSTALLED_APPS = [
     "apps.userApp",
     "apps.objectifsEpargnesApp",
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -182,17 +186,36 @@ BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-AUTH_USER_MODEL = 'userApp.User'
-# Template Settings
-# ------------------------------------------------------------------------------
 
+# Custom User Model
+AUTH_USER_MODEL = 'userApp.User'
+
+# Template Settings
 THEME_LAYOUT_DIR = THEME_LAYOUT_DIR
 THEME_VARIABLES = THEME_VARIABLES
 
 
+# ============================================
+# AUTHENTICATION & LOGIN/LOGOUT
+# ============================================
 
-# Your stuff...
-# ------------------------------------------------------------------------------
-LOGIN_REDIRECT_URL = 'index'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+LOGIN_REDIRECT_URL = 'revenue_list'  # ← Redirection après connexion
 LOGOUT_REDIRECT_URL = 'auth-login-basic'
 LOGIN_URL = 'auth-login-basic'
+
+
+# ============================================
+# EMAIL CONFIGURATION
+# ============================================
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sbenhaddad002@gmail.com'
+EMAIL_HOST_PASSWORD = 'siii gial gwdk hzge'
+DEFAULT_FROM_EMAIL = 'sbenhaddad002@gmail.com'
