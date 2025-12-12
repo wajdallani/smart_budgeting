@@ -29,7 +29,7 @@
   <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
       <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'revenue_list' %}"
+        <a class="navbar-brand" href="{% url 'revenueApp' %}"
           >💰 Smart Budgeting - Revenus</a
         >
       </div>
@@ -53,7 +53,7 @@
           class="card-header bg-white d-flex justify-content-between align-items-center py-3"
         >
           <h4 class="mb-0">📋 Mes Revenus</h4>
-          <a href="{% url 'revenue_create' %}" class="btn btn-primary">
+          <a href="{% url 'revenueApp:revenue_create' %}" class="btn btn-primary">
             ➕ Ajouter un revenu
           </a>
         </div>
@@ -93,14 +93,14 @@
                   <td>{{ revenue.description|default:"—" }}</td>
                   <td>
                     <a
-                      href="{% url 'revenue_update' revenue.pk %}"
+                      href="{% url 'revenueApp:revenue_update' revenue.pk %}"
                       class="btn btn-sm btn-warning"
                       title="Modifier"
                     >
                       ✏️ Modifier
                     </a>
                     <a
-                      href="{% url 'revenue_delete' revenue.pk %}"
+                      href="{% url 'revenueApp:revenue_delete' revenue.pk %}"
                       class="btn btn-sm btn-danger"
                       title="Supprimer"
                     >
@@ -118,7 +118,7 @@
             <h5 class="text-muted">Aucun revenu trouvé</h5>
             <p class="text-muted">Commencez par ajouter votre premier revenu</p>
             <a
-              href="{% url 'revenue_create' %}"
+              href="{% url 'revenueApp:revenue_create' %}"
               class="btn btn-primary btn-lg mt-3"
             >
               ➕ Ajouter votre premier revenu

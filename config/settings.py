@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     "apps.objectifsEpargnesApp",
     "apps.notificationApp",
 ]
+AUTH_USER_MODEL = 'userApp.User'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -104,6 +105,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.my_setting",
                 "config.context_processors.environment",
+                "apps.userApp.context_processors.menu_context",
                 "apps.notificationApp.context_processors.notifications_context",
             ],
             "libraries": {
@@ -184,7 +186,6 @@ BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-AUTH_USER_MODEL = 'userApp.User'
 # Template Settings
 # ------------------------------------------------------------------------------
 
@@ -198,3 +199,14 @@ THEME_VARIABLES = THEME_VARIABLES
 LOGIN_REDIRECT_URL = 'revenue_list'
 LOGOUT_REDIRECT_URL = 'auth-login-basic'
 LOGIN_URL = 'auth-login-basic'
+# Development email backend: print emails to console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# ---- Configuration Celery ----
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
