@@ -1,14 +1,9 @@
-{% extends layout_path %}
+{% extends 'layout/layout_vertical.html' %}
 {% load static %}
-{% load i18n %}
 
 {% block page_title %}
     {% if depense %}Modifier Dépense{% else %}Nouvelle Dépense{% endif %}
 {% endblock %}
-{% block vendor_js %}
-  {{ block.super }}
-  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
-{% endblock vendor_js %}
 
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -16,7 +11,15 @@
         <span class="text-muted fw-light">Dépenses /</span>
         {% if depense %}Modifier{% else %}Créer{% endif %}
     </h4>
-
+ {# 🔹 Ici : afficher les messages (succès, avertissements, etc.) #}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
     <div class="row">
         <div class="col-xl-8">
             <div class="card mb-4">
@@ -30,7 +33,13 @@
                 </div>
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
+
+    
+
                         {% csrf_token %}
+                        {% if ocr_preview %}
+      <input type="hidden" name="ocr_confirmed" value="1">
+    {% endif %}
                         
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger alert-dismissible" role="alert">
@@ -68,7 +77,130 @@
                     </form>
                 </div>
             </div>
+            <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("id_facture_img");
+    const amountInput = document.getElementById("id_amount");
+    const dateInput = document.getElementById("id_date");
+    const csrfInput = document.querySelector("[name=csrfmiddlewaretoken]");
+    const notesInput = document.getElementById("id_notes");
+
+    
+
+    if (!fileInput || !amountInput || !dateInput || !csrfInput) return;
+
+    const csrfToken = csrfInput.value;
+
+    fileInput.addEventListener("change", function () {
+      if (!fileInput.files.length) return;
+
+      const formData = new FormData();
+      formData.append("facture_img", fileInput.files[0]);
+
+      // Optionnel : petit loader
+      fileInput.closest(".mb-3")?.classList.add("position-relative");
+
+      fetch("{% url 'depense_ocr' %}", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
+        body: formData,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Erreur OCR");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Remplir seulement si le champ est vide (l'utilisateur peut écraser ensuite)
+          if (data.amount && !amountInput.value) {
+            amountInput.value = data.amount;
+          }
+          if (data.date && !dateInput.value) {
+            // on suppose format YYYY-MM-DD ou dd/mm/YYYY -> l’API peut normaliser
+            dateInput.value = data.date; // si besoin, adapter format côté utils.py
+          }
+
+          // Affichage message simple
+          if ((data.amount || data.date) && window.bootstrap) {
+            // tu peux aussi utiliser messages Django, mais là on reste côté front
+            console.log("OCR OK :", data);
+          }
+          // 🔹 Pré-remplir Notes avec un titre propre basé sur le nom du fichier
+  if (notesInput && !notesInput.value && fileInput.files.length > 0) {
+    let fileName = fileInput.files[0].name;
+
+    // retirer l'extension (.jpg, .png...)
+    fileName = fileName.replace(/\.[^/.]+$/, "");
+
+    // remplacer underscores / tirets par espace
+    fileName = fileName.replace(/[_-]+/g, " ");
+
+    // mettre une majuscule au début de chaque mot
+    fileName = fileName.replace(/\b\w/g, c => c.toUpperCase());
+
+    // final
+    notesInput.value = fileName;
+  }
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(() => {
+          fileInput.closest(".mb-3")?.classList.remove("position-relative");
+        });
+    });
+  });
+</script>
+
         </div>
     </div>
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("id_facture_img");
+    const amountInput = document.getElementById("id_amount");
+    const dateInput = document.getElementById("id_date");
+    const csrfInput = document.querySelector("[name=csrfmiddlewaretoken]");
+
+    if (!fileInput || !amountInput || !dateInput || !csrfInput) return;
+
+    const csrfToken = csrfInput.value;
+
+    fileInput.addEventListener("change", function () {
+      if (!fileInput.files.length) return;
+
+      const formData = new FormData();
+      formData.append("facture_img", fileInput.files[0]);
+
+      fetch("{% url 'depense_ocr' %}", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
+        body: formData,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Erreur OCR");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          if (data.amount && !amountInput.value) {
+            amountInput.value = data.amount;
+          }
+          if (data.date && !dateInput.value) {
+            dateInput.value = data.date; // déjà au format YYYY-MM-DD
+          }
+        })
+        .catch((err) => {
+          console.error("Erreur OCR:", err);
+        });
+    });
+  });
+</script>
+
 {% endblock %}
