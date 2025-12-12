@@ -198,6 +198,11 @@ class VerificationCodeForm(forms.Form):
             raise ValidationError("Le code doit contenir uniquement des chiffres.")
         return code
 
+    def clean_code(self):
+        code = self.cleaned_data.get('code')
+        if not code.isdigit():
+            raise ValidationError("Le code doit contenir uniquement des chiffres.")
+        return code
 
 class LoginForm(forms.Form):
     email = forms.EmailField(

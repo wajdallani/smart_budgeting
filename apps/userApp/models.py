@@ -34,7 +34,11 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('role', 'admin')
         extra_fields.setdefault('is_email_verified', True)
+<<<<<<< HEAD
         extra_fields.setdefault('is_active', True)
+=======
+        extra_fields.setdefault('is_active', True)  # 🔹 Superuser actif par défaut
+>>>>>>> ba44f0e (email verification)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser doit avoir is_staff=True.')
@@ -73,6 +77,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         default='utilisateur'
     )
 
+<<<<<<< HEAD
+=======
+    # 🔹 Champs de vérification email
+>>>>>>> ba44f0e (email verification)
     is_email_verified = models.BooleanField(
         verbose_name='Email vérifié',
         default=False
@@ -89,6 +97,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True
     )
 
+<<<<<<< HEAD
+=======
+    # Relation N-N métier User ↔ AppGroup via GroupMembre
+>>>>>>> ba44f0e (email verification)
     member_groups = models.ManyToManyField(
         'AppGroup',
         through='GroupMembre',
@@ -97,9 +109,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name='Groupes'
     )
     
+<<<<<<< HEAD
     is_active = models.BooleanField(
         verbose_name='Compte actif',
         default=False,
+=======
+    # 🔹 MODIFICATION : is_active = False par défaut
+    is_active = models.BooleanField(
+        verbose_name='Compte actif',
+        default=False,  # ← Compte INACTIF par défaut jusqu'à vérification
+>>>>>>> ba44f0e (email verification)
         help_text='Le compte devient actif uniquement après vérification de l\'email'
     )
     is_staff = models.BooleanField(default=False)
@@ -151,14 +170,25 @@ class User(AbstractBaseUser, PermissionsMixin):
     def verify_email(self):
         """
         Marque l'email comme vérifié, active le compte et nettoie le code
+<<<<<<< HEAD
         """
         self.is_email_verified = True
         self.is_active = True
+=======
+        🔹 MODIFICATION : Active également le compte
+        """
+        self.is_email_verified = True
+        self.is_active = True  # ← Active le compte
+>>>>>>> ba44f0e (email verification)
         self.email_verification_code = None
         self.verification_code_created_at = None
         self.save(update_fields=[
             'is_email_verified', 
+<<<<<<< HEAD
             'is_active',
+=======
+            'is_active',  # ← Ajouté
+>>>>>>> ba44f0e (email verification)
             'email_verification_code', 
             'verification_code_created_at'
         ])
@@ -166,7 +196,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class AppGroup(models.Model):
     """
+<<<<<<< HEAD
     Groupe métier
+=======
+    Groupe métier (rien à voir avec les groupes de permissions Django)
+    Attributs : id, name, created_at, nb_membre
+>>>>>>> ba44f0e (email verification)
     """
     name = models.CharField("Nom du groupe", max_length=150, unique=True)
     created_at = models.DateTimeField("Date de création", auto_now_add=True)
@@ -184,6 +219,10 @@ class AppGroup(models.Model):
 class GroupMembre(models.Model):
     """
     Table d'association entre User et AppGroup
+<<<<<<< HEAD
+=======
+    + date d'adhésion
+>>>>>>> ba44f0e (email verification)
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(AppGroup, on_delete=models.CASCADE)
