@@ -167,7 +167,7 @@
 
       <!-- Groupes -->
       <li class="menu-item {% if '/group/' in request.path %}active{% endif %}">
-        <a href="#" class="menu-link">
+        <a href="{% url 'groupApp:group_list' %}" class="menu-link">
           <i class="menu-icon icon-base bx bx-group"></i>
           <div class="text-truncate">Groupes</div>
         </a>
