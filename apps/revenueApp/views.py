@@ -47,7 +47,7 @@ def revenue_create(request):
             date=date
         )
         messages.success(request, 'Revenu ajouté avec succès!')
-        return redirect('revenue_list')
+        return redirect('revenueApp:revenue_list')
 
     context = {}
     context = layout.init(context)
@@ -70,7 +70,7 @@ def revenue_update(request, pk):
         revenue.save()
 
         messages.success(request, 'Revenu modifié avec succès!')
-        return redirect('revenue_list')
+        return redirect('revenueApp:revenue_list')
 
     context = {'revenue': revenue}
     context = layout.init(context)
@@ -88,7 +88,7 @@ def revenue_delete(request, pk):
     if request.method == 'POST':
         revenue.delete()
         messages.success(request, 'Revenu supprimé avec succès!')
-        return redirect('revenue_list')
+        return redirect('revenueApp:revenue_list')
 
     context = {'revenue': revenue}
     context = layout.init(context)

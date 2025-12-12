@@ -61,15 +61,15 @@ urlpatterns = [
     #path("group/", include("apps.groupApp.urls")),
 
     # Categorie App urls
-    #path("categorie/", include("apps.categorieApp.urls")),
+    path("categorie/", include("apps.categorieApp.urls")),
     # Depense App urls
-    #path("depense/", include("apps.depenseApp.urls")),
+    path("depense/", include("apps.depenseApp.urls")),
     # Revenue App urls
-    #path("revenue/", include("apps.revenueApp.urls")),
+    path("revenue/", include("apps.revenueApp.urls")),
     # Dette App urls
     path("dette/", include("apps.detteApp.urls")),
     # Objectifs Epargnes App urls
-    #path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
+    path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,4 +1,5 @@
-
+{% extends layout_path %}
+{% comment %} 
 {% extends layout_path %}
 
 {% load static %}
@@ -22,5 +23,74 @@
     <a href="{% url 'detteApp:debt_list' %}">Annuler</a>
   </form>
 
+{% endblock %} {% endcomment %}
+
+
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Supprimer la dette{% endblock %}
+
+{% block vendor_js %}
+  {{ block.super }}
+  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Back button -->
+    <a href="{% url 'detteApp:debt_list' %}" class="back-link mb-3 d-inline-flex align-items-center">
+        <i class="ti ti-arrow-left me-1"></i>
+        <span>{% trans "Retour à la liste des dettes" %}</span>
+    </a>
+
+    <!-- Confirmation Card -->
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4 class="card-title mb-0">{% trans "Suppression de la dette" %}</h4>
+        </div>
+
+        <div class="card-body">
+            <p class="fs-5">
+                {% trans "Êtes-vous sûr de vouloir supprimer cette dette ?" %}<br>
+                <strong class="text-danger">{{ debt.title }}</strong>
+            </p>
+
+            <p class="text-muted fst-italic">
+                {% trans "Cette action est irréversible." %}
+            </p>
+
+            <form method="post" class="mt-4 d-flex gap-3">
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn-danger px-4 py-2">
+                    <i class="ti ti-trash me-1"></i>
+                    {% trans "Oui, supprimer" %}
+                </button>
+
+                <a href="{% url 'detteApp:debt_list' %}" class="btn btn-secondary px-4 py-2">
+                    <i class="ti ti-x me-1"></i>
+                    {% trans "Annuler" %}
+                </a>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .back-link {
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
 {% endblock %}
+
 
