@@ -36,7 +36,7 @@ class RegisterView(AuthView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('index')
+            return redirect('revenue_list')
         return self.render_to_response(self.get_context_data())
 
     def post(self, request, *args, **kwargs):
@@ -45,7 +45,7 @@ class RegisterView(AuthView):
             user = form.save()
             messages.success(request, f'Compte créé avec succès ! Bienvenue {user.firstname} !')
             login(request, user)
-            return redirect('index')
+            return redirect('revenue_list')
 
         context = self.get_context_data()
         context['form'] = form
@@ -65,7 +65,7 @@ class LoginView(AuthView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('index')
+            return redirect('revenue_list')
         return self.render_to_response(self.get_context_data())
 
     def post(self, request, *args, **kwargs):
@@ -83,7 +83,7 @@ class LoginView(AuthView):
                     request.session.set_expiry(0)
 
                 messages.success(request, f'Bienvenue {user.firstname} !')
-                next_url = request.GET.get('next', 'index')
+                next_url = request.GET.get('next','revenue_list')
                 return redirect(next_url)
             else:
                 messages.error(request, 'Email ou mot de passe incorrect.')

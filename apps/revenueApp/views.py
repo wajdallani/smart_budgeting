@@ -4,7 +4,8 @@ from django.contrib import messages
 from .models import Revenue
 from django.db.models import Sum
 from web_project import TemplateLayout  # or from web_project.template_layout import TemplateLayout
-
+from apps.notificationApp.services import create_due_soon_epargne_notifications
+from apps.notificationApp.views import create_obj_epargne_reminder
 # Create ONE instance you can reuse
 layout = TemplateLayout()
 
@@ -27,7 +28,7 @@ def revenue_list(request):
     # fallback if layout_path is still empty
     if not context.get("layout_path"):
         context["layout_path"] = "layout_vertical.html"  # adjust if your file has another name
-
+    create_due_soon_epargne_notifications(request.user)
     return render(request, 'revenue/revenue_list.html', context)
 
 

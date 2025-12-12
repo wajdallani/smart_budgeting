@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "apps.groupApp",
     "apps.userApp",
     "apps.objectifsEpargnesApp",
+    "apps.notificationApp",
 ]
 
 MIDDLEWARE = [
@@ -103,6 +104,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.my_setting",
                 "config.context_processors.environment",
+                "apps.notificationApp.context_processors.notifications_context",
             ],
             "libraries": {
                 "theme": "web_project.template_tags.theme",
@@ -193,8 +195,6 @@ THEME_VARIABLES = THEME_VARIABLES
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = 'revenue_list'
 LOGOUT_REDIRECT_URL = 'auth-login-basic'
 LOGIN_URL = 'auth-login-basic'
-
-
