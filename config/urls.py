@@ -20,6 +20,7 @@ from django.urls import include, path
 from web_project.views import SystemView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
@@ -69,7 +70,12 @@ urlpatterns = [
     path("dette/", include("apps.detteApp.urls")),
     # Objectifs Epargnes App urls
     path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
-]
+    # GROUPE App urls
+    path('groups/', include('apps.groupApp.urls')),
+    #log out path 
+    path('logout/', auth_views.LogoutView.as_view(next_page='index'), name='logout'),
+    
+    ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
