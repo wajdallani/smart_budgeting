@@ -22,6 +22,40 @@
     <!-- /Search -->
 
     <ul class="navbar-nav flex-row align-items-center ms-auto">
+      <!-- Notifications -->
+      <li class="nav-item dropdown me-3">
+        <a class="nav-link" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="icon-base bx bx-bell"></i>
+          {% if notifications_count and notifications_count > 0 %}
+            <span class="badge rounded-pill bg-danger" id="notifications-badge">{{ notifications_count }}</span>
+          {% else %}
+            <span class="badge rounded-pill bg-secondary" id="notifications-badge">0</span>
+          {% endif %}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown" style="min-width:300px;">
+          <li class="dropdown-header">Notifications</li>
+          <li><hr class="dropdown-divider"></li>
+          {% if notifications and notifications|length > 0 %}
+            {% for n in notifications %}
+              <li class="px-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <a href="{% url 'detteApp:debt_detail' n.debt_id %}" class="dropdown-item notification-item" data-rappel-id="{{ n.id }}">{{ n.message }}</a>
+                    <small class="text-muted">{{ n.date_rappel }}</small>
+                  </div>
+                  <div>
+                    <button class="btn btn-sm btn-outline-secondary mark-seen-btn" data-rappel-id="{{ n.id }}">Mark</button>
+                  </div>
+                </div>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+            {% endfor %}
+          {% else %}
+            <li class="px-3"><small class="text-muted">No notifications</small></li>
+          {% endif %}
+        </ul>
+      </li>
+
       <!-- Place this tag where you want the button to render. -->
       <li class="nav-item lh-1 me-4">
         <a class="github-button" href="{% get_theme_variables 'git_repository' %}" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
@@ -79,3 +113,54 @@
     </ul>
   </div>
 </nav>
+
+    <script>
+    // Helper to read csrf token from cookie
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.mark-seen-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(ev) {
+          ev.preventDefault();
+          const rappelId = this.getAttribute('data-rappel-id');
+          const csrftoken = getCookie('csrftoken');
+          fetch('{% url "detteApp:mark_rappel_seen" %}', {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': csrftoken,
+              'Accept': 'application/json',
+            },
+            body: new URLSearchParams({ 'rappel_id': rappelId })
+          }).then(resp => resp.json()).then(data => {
+            if (data.ok) {
+              // remove the notification item visually
+              const item = document.querySelector('.notification-item[data-rappel-id="' + rappelId + '"]');
+              if (item) {
+                const parentLi = item.closest('li');
+                if (parentLi) parentLi.remove();
+              }
+              // update badge
+              const badge = document.getElementById('notifications-badge');
+              if (badge) {
+                let count = parseInt(badge.innerText || '0', 10) - 1;
+                badge.innerText = Math.max(0, count);
+              }
+            }
+          }).catch(err => console.error(err));
+        });
+      });
+    });
+    </script>

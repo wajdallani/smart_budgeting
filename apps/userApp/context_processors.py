@@ -11,6 +11,7 @@ def menu_context(request):
     context = {
         'notifications_count': 0,
         'user_full_name': '',
+        'notifications': [],
     }
     
     # Si l'utilisateur est authentifié
@@ -54,7 +55,7 @@ def menu_context(request):
                 }
                 for r in pending_rappels[:10]
             ]
-        except Exception:
+        except Exception as e:
             # If anything fails (import error, DB unavailable), leave defaults
             context['notifications_count'] = context.get('notifications_count', 0)
             context['notifications'] = []
