@@ -4,8 +4,7 @@ from django.contrib import messages
 from .models import Revenue
 from django.db.models import Sum
 from web_project import TemplateLayout  # or from web_project.template_layout import TemplateLayout
-from apps.notificationApp.services import create_due_soon_epargne_notifications
-from apps.notificationApp.views import create_obj_epargne_reminder
+
 # Create ONE instance you can reuse
 layout = TemplateLayout()
 
@@ -28,7 +27,7 @@ def revenue_list(request):
     # fallback if layout_path is still empty
     if not context.get("layout_path"):
         context["layout_path"] = "layout_vertical.html"  # adjust if your file has another name
-    create_due_soon_epargne_notifications(request.user)
+
     return render(request, 'revenue/revenue_list.html', context)
 
 
@@ -48,7 +47,7 @@ def revenue_create(request):
             date=date
         )
         messages.success(request, 'Revenu ajouté avec succès!')
-        return redirect('revenue_list')
+        return redirect('revenueApp:revenue_list')
 
     context = {}
     context = layout.init(context)
@@ -71,7 +70,7 @@ def revenue_update(request, pk):
         revenue.save()
 
         messages.success(request, 'Revenu modifié avec succès!')
-        return redirect('revenue_list')
+        return redirect('revenueApp:revenue_list')
 
     context = {'revenue': revenue}
     context = layout.init(context)
@@ -89,7 +88,7 @@ def revenue_delete(request, pk):
     if request.method == 'POST':
         revenue.delete()
         messages.success(request, 'Revenu supprimé avec succès!')
-        return redirect('revenue_list')
+        return redirect('revenueApp:revenue_list')
 
     context = {'revenue': revenue}
     context = layout.init(context)
