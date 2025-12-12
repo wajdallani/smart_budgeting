@@ -23,8 +23,67 @@
 
     <ul class="navbar-nav flex-row align-items-center ms-auto">
       <!-- Place this tag where you want the button to render. -->
-      <li class="nav-item lh-1 me-4">
+      {% comment %} <li class="nav-item lh-1 me-4">
         <a class="github-button" href="{% get_theme_variables 'git_repository' %}" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
+      </li> {% endcomment %}
+      <!-- Notification Bell. --> 
+     <li class="nav-item dropdown">
+        <a class="nav-link  p-0" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+
+          <!-- Round bell using Bootstrap classes only -->
+          <div class="rounded-circle border border-secondary d-flex position-relative justify-content-center align-items-center me-2"
+              style="width: 40px; height: 40px;">
+
+            <i class="bx bx-bell fs-5"></i>
+
+            {% if unread_notifications_count > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ unread_notifications_count }}
+              </span>
+            {% endif %}
+          </div>
+
+        </a>
+
+        <!-- Dropdown -->
+        <ul class="dropdown-menu dropdown-menu-end" style="width: 320px;">
+          {% if navbar_notifications %}
+            {% for notif in navbar_notifications %}
+              <li class="dropdown-item small text-wrap 
+                 {% if not notif.is_read %}bg-danger-subtle{% endif %}">
+                <div class="fw-semibold text-wrap text-break">
+                  {{ notif.title }}
+                </div>
+
+                {% if notif.message %}
+                  <div class="text-muted small text-wrap text-break">
+                    {{ notif.message }}
+                  </div>
+                {% endif %}
+
+                <div class="text-muted small">
+                  {{ notif.created_at|date:"d/m/Y H:i" }}
+                </div>
+
+              </li>
+
+              {% if not forloop.last %}
+                <li><hr class="dropdown-divider"></li>
+              {% endif %}
+            {% endfor %}
+
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-center" href="{% url 'notifications_list' %}">
+                View all notifications
+              </a>
+            </li>
+          {% else %}
+            <li class="dropdown-item text-center text-muted">
+              No notifications yet.
+            </li>
+          {% endif %}
+        </ul>
       </li>
 
       <!-- User -->
