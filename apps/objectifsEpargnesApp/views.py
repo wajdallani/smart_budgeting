@@ -1,4 +1,3 @@
-from django.shortcuts import render
 
 # Create your views here.
 
@@ -9,6 +8,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .models import ObjEpargne
 from .forms import ObjEpargneForm
 from web_project import TemplateLayout
+from apps.notificationApp.views import create_obj_epargne_reminder
+
 #READ
 class ObjectifEpargneListView( ListView):
     model = ObjEpargne
@@ -44,6 +45,8 @@ class ObjectifEpargneCreateView( LoginRequiredMixin,CreateView):
     def form_valid(self, form):
         print("👉​ DEBUG user:", self.request.user, self.request.user.is_authenticated)
         form.instance.user = self.request.user
+        create_obj_epargne_reminder(self.request.user, self.object)
+
         return super().form_valid(form)
     def get_context_data(self, **kwargs):
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
