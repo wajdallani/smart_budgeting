@@ -173,6 +173,8 @@ BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
 # Template Settings
 # ------------------------------------------------------------------------------
 
@@ -187,6 +189,8 @@ LOGIN_REDIRECT_URL = 'revenueApp:' \
 ''
 LOGOUT_REDIRECT_URL = 'auth-login-basic'
 LOGIN_URL = 'auth-login-basic'
+
+
 # Development email backend: print emails to console
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

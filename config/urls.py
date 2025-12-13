@@ -59,7 +59,10 @@ urlpatterns = [
     # Tables urls
     path("", include("apps.tables.urls")),
     # Group App urls
+
     path("group/", include("apps.groupApp.urls")),
+
+ 
 
     # Categorie App urls
     path("categorie/", include("apps.categorieApp.urls")),

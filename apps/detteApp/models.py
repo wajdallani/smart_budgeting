@@ -2,10 +2,9 @@
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.conf import settings  # IMPORTANT : utiliser le custom user model
+from django.conf import settings
 from datetime import timedelta
 
-# Create your models here.
 
 class Debt(models.Model):
     title = models.CharField(max_length=200)
@@ -29,11 +28,16 @@ class Debt(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title} — {self.remaining_amount} restant"
+
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         super().save(*args, **kwargs)
 
-        # Créer automatiquement un rappel
         if is_new and self.due_date:
             date_rappel = timezone.make_aware(
                 timezone.datetime.combine(
@@ -41,26 +45,11 @@ class Debt(models.Model):
                     timezone.datetime.min.time()
                 )
             )
-
             Rappel.objects.create(
                 debt=self,
                 date_rappel=date_rappel,
                 actif=True
             )
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.title} — {self.remaining_amount} restant"
-
-
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.title} — {self.remaining_amount} restant"
 
     def get_absolute_url(self):
         return reverse('detteApp:debt_detail', args=[str(self.pk)])
@@ -77,7 +66,7 @@ class Debt(models.Model):
         if self.original_amount:
             return ((self.original_amount - self.remaining_amount) / self.original_amount) * 100
         return 0
-        
+
     @property
     def amount_paid(self):
         return self.original_amount - self.remaining_amount
@@ -91,16 +80,17 @@ class Rappel(models.Model):
 
     def __str__(self):
         from datetime import date
+        if not self.debt or not self.debt.due_date:
+            return f"Rappel pour dette inconnue"
         today = date.today()
-        if self.debt.due_date:
-            days_left = (self.debt.due_date - today).days
-            if days_left == 0:
-                return f"Rappel: {self.debt.title} — C'est l'échéance aujourd'hui!"
-            elif days_left == 1:
-                return f"Rappel: {self.debt.title} — Il reste 1 jour avant l'échéance"
-            else:
-                return f"Rappel: {self.debt.title} — Il reste {days_left} jours avant l'échéance"
-        return f"Rappel pour {self.debt}"
+        days_left = (self.debt.due_date - today).days
+        if days_left == 0:
+            return f"Rappel: {self.debt.title} — C'est l'échéance aujourd'hui!"
+        elif days_left == 1:
+            return f"Rappel: {self.debt.title} — Il reste 1 jour avant l'échéance"
+        else:
+            return f"Rappel: {self.debt.title} — Il reste {days_left} jours avant l'échéance"
+
 
 class Payment(models.Model):
     debt = models.ForeignKey(Debt, related_name='payments', on_delete=models.CASCADE)
@@ -115,4 +105,3 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"{self.amount} on {self.date}"
-    
