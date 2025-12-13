@@ -3,7 +3,12 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.core.validators import EmailValidator,RegexValidator
 from django.core.exceptions import ValidationError
+import random
+import string
 import re
+from django.utils import timezone
+from datetime import timedelta
+from django.core.validators import EmailValidator
 
 
 def validate_no_special_chars(value):
@@ -29,6 +34,8 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('role', 'admin')
+        extra_fields.setdefault('is_email_verified', True)
+        extra_fields.setdefault('is_active', True)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser doit avoir is_staff=True.')
@@ -84,6 +91,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         choices=ROLE_CHOICES,
         default='utilisateur'
     )
+    is_email_verified = models.BooleanField(
+        verbose_name='Email vérifié',
+        default=False
+    )
+    email_verification_code = models.CharField(
+        verbose_name='Code de vérification',
+        max_length=6,
+        blank=True,
+        null=True
+    )
+    verification_code_created_at = models.DateTimeField(
+        verbose_name='Date de création du code',
+        blank=True,
+        null=True
+    )
 
     # 🔹 Relation N-N métier User ↔ AppGroup via GroupMembre
     member_groups = models.ManyToManyField(
@@ -94,7 +116,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name='Groupes'
     )
     
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        verbose_name='Compte actif',
+        default=False,
+        help_text='Le compte devient actif uniquement après vérification de l\'email'
+    )
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -121,6 +147,40 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_admin(self):
         return self.role == 'admin'
+    def generate_verification_code(self):
+        """Génère un code de vérification à 6 chiffres"""
+        code = ''.join(random.choices(string.digits, k=6))
+        self.email_verification_code = code
+        self.verification_code_created_at = timezone.now()
+        self.save(update_fields=['email_verification_code', 'verification_code_created_at'])
+        return code
+
+    def is_verification_code_valid(self, code, expiry_minutes=10):
+        """Vérifie si le code est valide et non expiré"""
+        if not self.email_verification_code or not self.verification_code_created_at:
+            return False
+        
+        if self.email_verification_code != code:
+            return False
+        
+        expiry_time = self.verification_code_created_at + timedelta(minutes=expiry_minutes)
+        return timezone.now() <= expiry_time
+
+    def verify_email(self):
+        """
+        Marque l'email comme vérifié, active le compte et nettoie le code
+        """
+        self.is_email_verified = True
+        self.is_active = True
+        self.email_verification_code = None
+        self.verification_code_created_at = None
+        self.save(update_fields=[
+            'is_email_verified', 
+            'is_active',
+            'email_verification_code', 
+            'verification_code_created_at'
+        ])
+
 
 
 class GroupMembre(models.Model):
