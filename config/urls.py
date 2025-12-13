@@ -37,6 +37,7 @@ urlpatterns = [
     # Auth urls
     path("", include("apps.authentication.urls")),
 
+
     # Card urls
     path("", include("apps.cards.urls")),
 
@@ -58,7 +59,10 @@ urlpatterns = [
     # Tables urls
     path("", include("apps.tables.urls")),
     # Group App urls
+
     #path("group/", include("apps.groupApp.urls")),
+
+ 
 
     # Categorie App urls
     path("categorie/", include("apps.categorieApp.urls")),

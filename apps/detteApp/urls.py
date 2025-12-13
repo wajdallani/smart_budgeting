@@ -16,4 +16,3 @@ urlpatterns = [
     path('rappels/mark-seen/', views.mark_rappel_seen, name='mark_rappel_seen'),
     
 ]
-

@@ -1,0 +1,145 @@
+<!-- templates/groupApp/group_list.html -->
+{% extends 'layout/layout_vertical.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  .page-header-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+  }
+  .page-header-gradient h4 {
+    color: white;
+    margin-bottom: 0.5rem;
+  }
+  .page-header-gradient p {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .page-header-gradient .btn {
+    background-color: white;
+    color: #667eea;
+    border: none;
+  }
+  .page-header-gradient .btn:hover {
+    background-color: #f8f9ff;
+    color: #667eea;
+  }
+</style>
+
+<div class="row">
+  <div class="col-12">
+    <!-- Page Header with Gradient Background -->
+    <div class="page-header-gradient d-flex align-items-center justify-content-between">
+      <div>
+        <h4 class="fw-bold mb-0">Mes Groupes</h4>
+        <p class="mb-0 fs-6">Gérez vos groupes budgétaires</p>
+      </div>
+      <a href="{% url 'groupApp:group_create' %}" class="btn btn-light">
+        <i class="icon-base bx bx-plus me-2"></i>Créer un Groupe
+      </a>
+    </div>
+
+    <!-- Groups Grid -->
+    {% if groups %}
+      <div class="row g-4">
+        {% for group in groups %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 transition-all" style="transition: all 0.3s ease;">
+              <div class="card-header bg-light border-0 pb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="flex-grow-1">
+                    <h5 class="card-title mb-1 fw-bold">{{ group.name }}</h5>
+                    <small class="text-muted">
+                      <i class="icon-base bx bx-user me-1"></i>Par {{ group.created_by.get_full_name|default:group.created_by.email }}
+                    </small>
+                  </div>
+                  {% if request.user == group.created_by %}
+                    <span class="badge bg-success">Propriétaire</span>
+                  {% else %}
+                    <span class="badge bg-info">Membre</span>
+                  {% endif %}
+                </div>
+              </div>
+              
+              <div class="card-body">
+                <p class="card-text text-muted mb-3">
+                  {{ group.description|default:"Aucune description" }}
+                </p>
+                
+                <!-- Group Stats -->
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <div class="bg-light rounded p-2 text-center">
+                      <small class="text-muted d-block">Membres</small>
+                      <span class="fw-bold">{{ group.members.count }}</span>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="bg-light rounded p-2 text-center">
+                      <small class="text-muted d-block">Créé</small>
+                      <span class="fw-bold" title="{{ group.created_at }}">{{ group.created_at|date:"d/m/Y" }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer bg-light border-0 pt-2">
+                <div class="d-flex gap-2">
+                  <a href="{% url 'groupApp:group_update' group.pk %}" class="btn btn-sm btn-outline-primary flex-grow-1" title="Modifier">
+                    <i class="icon-base bx bx-edit me-1"></i>Modifier
+                  </a>
+                  {% if request.user == group.created_by %}
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ group.pk }}" title="Supprimer">
+                      <i class="icon-base bx bx-trash"></i>
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete Confirmation Modal -->
+          {% if request.user == group.created_by %}
+            <div class="modal fade" id="deleteModal{{ group.pk }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p class="text-muted">Êtes-vous certain de vouloir supprimer le groupe <strong>{{ group.name }}</strong> ? Cette action ne peut pas être annulée.</p>
+                  </div>
+                  <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form method="post" action="{% url 'groupApp:group_delete' group.pk %}" style="display: inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <div class="mb-3">
+            <i class="icon-base bx bx-folder-open fs-1 text-muted"></i>
+          </div>
+          <h5 class="fw-bold mb-2">Aucun groupe</h5>
+          <p class="text-muted mb-4">Vous n'avez pas encore créé ou rejoint de groupe. Créez votre premier groupe pour commencer !</p>
+          <a href="{% url 'groupApp:group_create' %}" class="btn btn-primary">
+            <i class="icon-base bx bx-plus me-2"></i>Créer un groupe
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

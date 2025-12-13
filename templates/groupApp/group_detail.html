@@ -1,0 +1,21 @@
+{% extends 'partials/layout.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>{{ group.name }}</h2>
+        {% if group.created_by == user or user.is_admin %}
+            <div>
+                <a href="{% url 'groupApp:group_update' group.id %}" class="btn btn-sm btn-outline-warning">Modifier</a>
+                <a href="{% url 'groupApp:group_delete' group.id %}" class="btn btn-sm btn-outline-danger">Supprimer</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <p>{{ group.description|default:"Aucune description" }}</p>
+    <p><strong>Créé par :</strong> {{ group.created_by.get_full_name }}</p>
+    <p><strong>Membres :</strong> {{ group.nb_membre }}</p>
+    
+    <a href="{% url 'groupApp:group_list' %}" class="btn btn-secondary">&larr; Retour à mes groupes</a>
+</div>
+{% endblock %}

@@ -66,3 +66,5 @@ if users.exists():
         print(f"    date_rappel <= now? {r.date_rappel <= now}")
 
 print("\n" + "=" * 60)
+
+

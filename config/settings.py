@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "apps.groupApp",
     "apps.userApp",
     "apps.objectifsEpargnesApp",
+    "apps.notificationApp",
 ]
 AUTH_USER_MODEL = 'userApp.User'
 
@@ -105,6 +106,7 @@ TEMPLATES = [
                 "config.context_processors.my_setting",
                 "config.context_processors.environment",
                 "apps.userApp.context_processors.menu_context",
+                "apps.notificationApp.context_processors.notifications_context",
             ],
             "libraries": {
                 "theme": "web_project.template_tags.theme",
@@ -185,6 +187,7 @@ BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
 # Template Settings
 # ------------------------------------------------------------------------------
 
@@ -195,9 +198,10 @@ THEME_VARIABLES = THEME_VARIABLES
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = 'revenue_list'
 LOGOUT_REDIRECT_URL = 'auth-login-basic'
 LOGIN_URL = 'auth-login-basic'
+
 
 # Development email backend: print emails to console
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -210,3 +214,5 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+

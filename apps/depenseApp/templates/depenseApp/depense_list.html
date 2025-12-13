@@ -1,13 +1,7 @@
-{% extends layout_path %}
-
+{% extends 'layout/layout_vertical.html' %}
 {% load static %}
-{% load i18n %}
-{% block page_title %}Liste des Dépenses{% endblock %}
 
-{% block vendor_js %}
-  {{ block.super }}
-  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
-{% endblock vendor_js %}
+{% block page_title %}Liste des Dépenses{% endblock %}
 
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -70,6 +64,36 @@
             </div>
         </div>
     </div>
+        <!-- Alerte Revenus vs Dépenses -->
+    {% if revenue_alert_message %}
+      <div class="alert alert-{{ revenue_alert_level }} mb-3">
+        {{ revenue_alert_message }}
+      </div>
+
+      {% if total_revenue_month > 0 %}
+        <div class="mb-4">
+          <p class="mb-1">
+            Dépenses du mois : {{ total_expenses_month|floatformat:2 }} € /
+            Revenus : {{ total_revenue_month|floatformat:2 }} €
+            ({{ revenue_percent|floatformat:0 }}%)
+          </p>
+          <div class="progress" style="height: 8px;">
+            <div
+              class="progress-bar
+                {% if revenue_alert_level == 'danger' %} bg-danger
+                {% elif revenue_alert_level == 'warning' %} bg-warning
+                {% else %} bg-success
+                {% endif %}"
+              role="progressbar"
+              style="width: {{ revenue_percent|floatformat:0 }}%;"
+              aria-valuenow="{{ revenue_percent|floatformat:0 }}"
+              aria-valuemin="0"
+              aria-valuemax="100">
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
 
     <!-- Table des dépenses -->
     <div class="card">

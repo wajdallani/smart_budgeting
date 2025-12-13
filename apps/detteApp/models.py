@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.conf import settings  # IMPORTANT : utiliser le custom user model
 
+# Create your models here.
 
 class Debt(models.Model):
     title = models.CharField(max_length=200)  # ex: "Prêt à Paul"
@@ -24,6 +25,7 @@ class Debt(models.Model):
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True)
+
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -50,6 +52,7 @@ class Debt(models.Model):
             return ((self.original_amount - self.remaining_amount) / self.original_amount) * 100
         return 0
     
+        
     @property
     def amount_paid(self):
         return self.original_amount - self.remaining_amount

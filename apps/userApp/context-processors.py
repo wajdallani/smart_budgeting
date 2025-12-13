@@ -1,5 +1,3 @@
-# userApp/context_processors.py
-
 from django.db.models import Q
 from django.utils import timezone
 
