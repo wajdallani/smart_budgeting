@@ -7,7 +7,4 @@ sqlparse==0.5.3
 typing-extensions==4.14.1
 whitenoise==6.9.0
 
-# Celery for background tasks
-celery
-# Redis as broker/backend (if using redis)
-redis
+
