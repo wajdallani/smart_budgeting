@@ -42,7 +42,7 @@ class RegisterView(AuthView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('revenue_list')
+            return redirect('revenueApp:revenue_list')
         return self.render_to_response(self.get_context_data())
 
     def post(self, request, *args, **kwargs):
@@ -175,7 +175,7 @@ class VerifyEmailView(AuthView):
                 del request.session['pending_user_id']
                 login(request, user, backend='apps.authentication.backends.EmailBackend')
                 messages.success(request, f'Email vérifié et compte activé avec succès ! Bienvenue {user.firstname} !')
-                return redirect('revenue_list')
+                return redirect('revenueApp:revenue_list')
             else:
                 messages.error(request, 'Code invalide ou expiré. Veuillez réessayer.')
 
@@ -224,7 +224,7 @@ class LoginView(AuthView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('revenue_list')
+            return redirect('revenueApp:revenue_list')
         return self.render_to_response(self.get_context_data())
 
     def post(self, request, *args, **kwargs):
@@ -272,7 +272,7 @@ class LoginView(AuthView):
                     request.session.set_expiry(0)
 
                 messages.success(request, f'Bienvenue {user.firstname} !')
-                next_url = request.GET.get('next', 'revenue_list')
+                next_url = request.GET.get('next', 'revenueApp:revenue_list')
                 return redirect(next_url)
             else:
                 messages.error(request, 'Email ou mot de passe incorrect.')

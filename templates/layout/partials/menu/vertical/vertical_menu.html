@@ -25,27 +25,27 @@
     {# =================================== #}
     {% if user.is_superuser or user.is_staff %}
 
-      <!-- Gestion utilisateurs -->
-      <li class="menu-item {% if 'user/user' in request.path %}active open{% endif %}">
-        <a href="javascript:void(0);" class="menu-link menu-toggle">
-          <i class="menu-icon tf-icons bx bx-group"></i>
-          <div data-i18n="Gestion Utilisateurs">Gérer Utilisateurs</div>
-        </a>
-        <ul class="menu-sub">
-          <li class="menu-item {% if 'user/user/add' in request.path %}active{% endif %}">
-            <a href="{% url 'admin:userApp_user_add' %}" class="menu-link">
-              <i class="bx bx-plus-circle"></i>
-              <div data-i18n="Ajouter utilisateur">Ajouter un utilisateur</div>
-            </a>
-          </li>
-          <li class="menu-item {% if 'user/user' in request.path and 'add' not in request.path %}active{% endif %}">
-            <a href="{% url 'admin:userApp_user_changelist' %}" class="menu-link">
-              <i class="bx bx-list-ul"></i>
-              <div data-i18n="Liste utilisateurs">Liste des utilisateurs</div>
-            </a>
-          </li>
-        </ul>
-      </li>
+     <!-- Gestion utilisateurs -->
+<li class="menu-item {% if 'userApp/user' in request.path or 'user/user' in request.path %}active open{% endif %}">
+  <a href="javascript:void(0);" class="menu-link menu-toggle">
+    <i class="menu-icon tf-icons bx bx-group"></i>
+    <div data-i18n="Gestion Utilisateurs">Gérer Utilisateurs</div>
+  </a>
+  <ul class="menu-sub">
+    <li class="menu-item {% if '/add' in request.path and 'user' in request.path %}active{% endif %}">
+      <a href="{% url 'admin:userApp_user_add' %}" class="menu-link">
+        <i class="bx bx-plus-circle"></i>
+        <div data-i18n="Ajouter utilisateur">Ajouter un utilisateur</div>
+      </a>
+    </li>
+    <li class="menu-item {% if 'user/user' in request.path and 'add' not in request.path and 'change' not in request.path %}active{% endif %}">
+      <a href="{% url 'admin:userApp_user_changelist' %}" class="menu-link">
+        <i class="bx bx-list-ul"></i>
+        <div data-i18n="Liste utilisateurs">Liste des utilisateurs</div>
+      </a>
+    </li>
+  </ul>
+</li>
 
       <!-- Gestion groupes -->
       <li class="menu-item {% if 'auth/group' in request.path %}active open{% endif %}">
