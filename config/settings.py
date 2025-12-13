@@ -196,7 +196,8 @@ AUTH_USER_MODEL = 'userApp.User'
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-LOGIN_REDIRECT_URL = 'revenue_list'
+LOGIN_REDIRECT_URL = 'revenueApp:' \
+''
 LOGOUT_REDIRECT_URL = 'auth-login-basic'
 LOGIN_URL = 'auth-login-basic'
 # Development email backend: print emails to console
@@ -210,3 +211,11 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sbenhaddad002@gmail.com'
+EMAIL_HOST_PASSWORD = 'siii gial gwdk hzge'
+DEFAULT_FROM_EMAIL = 'sbenhaddad002@gmail.com'
