@@ -1,0 +1,24 @@
+
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Supprimer la dette{% endblock %}
+
+{% block vendor_js %}
+  {{ block.super }}
+  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
+{% endblock vendor_js %}
+
+
+{% block content %}
+  <h1>Supprimer la dette: {{ debt.title }}</h1>
+  <p>Êtes-vous sûr de vouloir supprimer cette dette ? Cette action est irréversible.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Oui, supprimer</button>
+    <a href="{% url 'detteApp:debt_list' %}">Annuler</a>
+  </form>
+{% endblock %}

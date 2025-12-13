@@ -9,4 +9,5 @@ urlpatterns = [
     path('create/', views.DepenseCreateView.as_view(), name='depense_create'),
     path('update/<int:pk>/', views.DepenseUpdateView.as_view(), name='depense_update'),
     path('delete/<int:pk>/', views.DepenseDeleteView.as_view(), name='depense_delete'),
+    path('ocr-invoice/', views.depense_ocr_api, name='depense_ocr'),
 ]

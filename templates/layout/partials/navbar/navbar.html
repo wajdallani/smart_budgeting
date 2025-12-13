@@ -22,11 +22,102 @@
     <!-- /Search -->
 
     <ul class="navbar-nav flex-row align-items-center ms-auto">
-      <!-- Place this tag where you want the button to render. -->
-      <li class="nav-item lh-1 me-4">
-        <a class="github-button" href="{% get_theme_variables 'git_repository' %}" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
+         <!-- Notifications -->
+      <li class="nav-item dropdown me-3">
+        <a class="nav-link" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="icon-base bx bx-bell"></i>
+          {% if notifications_count and notifications_count > 0 %}
+            <span class="badge rounded-pill bg-danger" id="notifications-badge">{{ notifications_count }}</span>
+          {% else %}
+            <span class="badge rounded-pill bg-secondary" id="notifications-badge">0</span>
+          {% endif %}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown" style="min-width:300px;">
+          <li class="dropdown-header">Notifications</li>
+          <li><hr class="dropdown-divider"></li>
+          {% if notifications and notifications|length > 0 %}
+            {% for n in notifications %}
+              <li class="px-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <a href="{% url 'detteApp:debt_detail' n.debt_id %}" class="dropdown-item notification-item" data-rappel-id="{{ n.id }}">{{ n.message }}</a>
+                    <small class="text-muted">{{ n.date_rappel }}</small>
+                  </div>
+                  <div>
+                    <button class="btn btn-sm btn-outline-secondary mark-seen-btn" data-rappel-id="{{ n.id }}">Mark</button>
+                  </div>
+                </div>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+            {% endfor %}
+          {% else %}
+            <li class="px-3"><small class="text-muted">No notifications</small></li>
+          {% endif %}
+        </ul>
       </li>
+      <!-- Place this tag where you want the button to render. -->
+      {% comment %} <li class="nav-item lh-1 me-4">
+        <a class="github-button" href="{% get_theme_variables 'git_repository' %}" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
+      </li> {% endcomment %}
+      <!-- Notification Bell. --> 
+     <li class="nav-item dropdown">
+        <a class="nav-link  p-0" href="#" data-bs-toggle="dropdown" aria-expanded="false">
 
+          <!-- Round bell using Bootstrap classes only -->
+          <div class="rounded-circle border border-secondary d-flex position-relative justify-content-center align-items-center me-2"
+              style="width: 40px; height: 40px;">
+
+            <i class="bx bx-bell fs-5"></i>
+
+            {% if unread_notifications_count > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ unread_notifications_count }}
+              </span>
+            {% endif %}
+          </div>
+
+        </a>
+
+        <!-- Dropdown -->
+        <ul class="dropdown-menu dropdown-menu-end" style="width: 320px;">
+          {% if navbar_notifications %}
+            {% for notif in navbar_notifications %}
+              <li class="dropdown-item small text-wrap 
+                 {% if not notif.is_read %}bg-danger-subtle{% endif %}">
+                <div class="fw-semibold text-wrap text-break">
+                  {{ notif.title }}
+                </div>
+
+                {% if notif.message %}
+                  <div class="text-muted small text-wrap text-break">
+                    {{ notif.message }}
+                  </div>
+                {% endif %}
+
+                <div class="text-muted small">
+                  {{ notif.created_at|date:"d/m/Y H:i" }}
+                </div>
+
+              </li>
+
+              {% if not forloop.last %}
+                <li><hr class="dropdown-divider"></li>
+              {% endif %}
+            {% endfor %}
+
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-center" href="{% url 'notifications_list' %}">
+                View all notifications
+              </a>
+            </li>
+          {% else %}
+            <li class="dropdown-item text-center text-muted">
+              No notifications yet.
+            </li>
+          {% endif %}
+        </ul>
+      </li>
       <!-- User -->
       <li class="nav-item navbar-dropdown dropdown-user dropdown">
         <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -71,7 +162,7 @@
             <div class="dropdown-divider my-1"></div>
           </li>
           <li>
-            <a class="dropdown-item" href="javascript:void(0);"> <i class="icon-base bx bx-power-off icon-md me-3"></i><span>Log Out</span> </a>
+            <a class="dropdown-item" href="{% url 'auth-logout' %}"> <i class="icon-base bx bx-power-off icon-md me-3"></i><span>Log Out</span> </a>
           </li>
         </ul>
       </li>
@@ -79,3 +170,54 @@
     </ul>
   </div>
 </nav>
+
+    <script>
+    // Helper to read csrf token from cookie
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.mark-seen-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(ev) {
+          ev.preventDefault();
+          const rappelId = this.getAttribute('data-rappel-id');
+          const csrftoken = getCookie('csrftoken');
+          fetch('{% url "detteApp:mark_rappel_seen" %}', {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': csrftoken,
+              'Accept': 'application/json',
+            },
+            body: new URLSearchParams({ 'rappel_id': rappelId })
+          }).then(resp => resp.json()).then(data => {
+            if (data.ok) {
+              // remove the notification item visually
+              const item = document.querySelector('.notification-item[data-rappel-id="' + rappelId + '"]');
+              if (item) {
+                const parentLi = item.closest('li');
+                if (parentLi) parentLi.remove();
+              }
+              // update badge
+              const badge = document.getElementById('notifications-badge');
+              if (badge) {
+                let count = parseInt(badge.innerText || '0', 10) - 1;
+                badge.innerText = Math.max(0, count);
+              }
+            }
+          }).catch(err => console.error(err));
+        });
+      });
+    });
+    </script>

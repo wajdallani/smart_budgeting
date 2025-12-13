@@ -1,6 +1,5 @@
-# userApp/context_processors.py
-
 from django.db.models import Q
+from django.utils import timezone
 
 def menu_context(request):
     """
@@ -29,15 +28,32 @@ def menu_context(request):
         if not context['user_full_name']:
             context['user_full_name'] = request.user.email
         
-        # Compter les notifications non lues (si vous avez un modèle Notification)
-        # Décommentez ces lignes si vous avez un modèle Notification
-        # try:
-        #     from votre_app.models import Notification
-        #     context['notifications_count'] = Notification.objects.filter(
-        #         user=request.user,
-        #         read=False
-        #     ).count()
-        # except ImportError:
-        #     pass
+        # Count pending reminders (Rappel) for this user and expose them
+        try:
+            from apps.detteApp.models import Rappel
+
+            maintenant = timezone.now()
+            pending_rappels = Rappel.objects.filter(
+                debt__utilisateur=request.user,
+                actif=True,
+                envoye=False,
+                date_rappel__lte=maintenant
+            ).order_by('date_rappel')
+
+            context['notifications_count'] = pending_rappels.count()
+            # expose a short list of pending reminders (limit 10)
+            context['notifications'] = [
+                {
+                    'id': r.pk,
+                    'message': str(r),
+                    'date_rappel': r.date_rappel,
+                    'debt_id': r.debt_id,
+                }
+                for r in pending_rappels[:10]
+            ]
+        except Exception:
+            # If anything fails (import error, DB unavailable), leave defaults
+            context['notifications_count'] = context.get('notifications_count', 0)
+            context['notifications'] = []
     
     return context

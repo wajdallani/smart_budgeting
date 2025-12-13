@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     "apps.objectifsEpargnesApp",
     "apps.notificationApp",
 ]
+AUTH_USER_MODEL = 'userApp.User'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

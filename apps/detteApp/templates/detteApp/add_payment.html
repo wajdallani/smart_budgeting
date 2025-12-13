@@ -1,0 +1,88 @@
+
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Ajouter paiement pour{% endblock %}
+
+{% block vendor_js %}
+  {{ block.super }}
+  <script src="{% static 'vendor/libs/masonry/masonry.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+  {% comment %} <h1>Ajouter paiement pour: {{ debt.title }}</h1>
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Ajouter paiement</button>
+  </form> {% endcomment %}
+  <div class="col-xl mx-auto">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Ajouter un paiement</h5>
+      <small class="text-body float-end">Formulaire</small>
+    </div>
+
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+
+        {% if form.errors %}
+          <div class="alert alert-danger">
+            <strong>Veuillez corriger les erreurs ci-dessous :</strong>
+          </div>
+        {% endif %}
+
+        <!-- AMOUNT -->
+        <div class="mb-3">
+          <label class="form-label" for="id_amount">Montant</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text">
+              <i class="bx bx-money"></i>
+            </span>
+            {{ form.amount }}
+            <span class="input-group-text">TND</span>
+          </div>
+          {% if form.amount.errors %}
+            <small class="text-danger">{{ form.amount.errors|striptags }}</small>
+          {% endif %}
+        </div>
+
+        <!-- DATE -->
+        <div class="mb-3">
+          <label class="form-label" for="id_date">Date du paiement</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text">
+              <i class="bx bx-calendar"></i>
+            </span>
+            {{ form.date }}
+          </div>
+          {% if form.date.errors %}
+            <small class="text-danger">{{ form.date.errors|striptags }}</small>
+          {% endif %}
+        </div>
+
+        <!-- NOTE -->
+        <div class="mb-3">
+          <label class="form-label" for="id_note">Note</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text">
+              <i class="bx bx-comment-detail"></i>
+            </span>
+            {{ form.note }}
+          </div>
+          {% if form.note.errors %}
+            <small class="text-danger">{{ form.note.errors|striptags }}</small>
+          {% endif %}
+        </div>
+
+        <!-- SUBMIT BUTTON -->
+        <button type="submit" class="btn btn-primary mt-3">Enregistrer le paiement</button>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
