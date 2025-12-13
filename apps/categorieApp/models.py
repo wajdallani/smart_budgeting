@@ -1,13 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.conf import settings
 
 class Categorie(models.Model):
     nom = models.CharField(max_length=100, verbose_name="Nom de la catégorie")
     description = models.TextField(blank=True, null=True, verbose_name="Description")
     est_globale = models.BooleanField(default=False, verbose_name="Catégorie globale")
     utilisateur = models.ForeignKey(
-        User, 
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE, 
         null=True, 
         blank=True,

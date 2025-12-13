@@ -1,0 +1,51 @@
+{% extends layout_path %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Notifications</h3>
+
+  <form method="POST" action="{% url 'notification_mark_all_read' %}" class="mb-3">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-sm btn-outline-primary">
+      Mark all as read
+    </button>
+  </form>
+
+  {% if notifications %}
+    <ul class="list-group">
+      {% for notif in notifications %}
+        <li class="list-group-item d-flex justify-content-between align-items-center
+                   {% if not notif.is_read %}fw-bold{% endif %}">
+          <div>
+            <div>{{ notif.title }}</div>
+            {% if notif.message %}
+              <small class="text-muted">{{ notif.message }}</small><br>
+            {% endif %}
+            <small class="text-muted">{{ notif.created_at }}</small>
+          </div>
+
+          <div class="d-flex gap-2">
+            {% if notif.link %}
+              <a href="{{ notif.link }}" class="btn btn-sm btn-secondary">Open</a>
+            {% endif %}
+            {% if not notif.is_read %}
+              <form method="POST" action="{% url 'notification_mark_read' notif.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-success">
+                  Mark as read
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No notifications yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
