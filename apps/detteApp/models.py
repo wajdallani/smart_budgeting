@@ -8,7 +8,6 @@ from datetime import timedelta
 
 
 # Create your models here.
-
 class Debt(models.Model):
     title = models.CharField(max_length=200)
     creditor = models.CharField(max_length=150, blank=True)
@@ -28,8 +27,6 @@ class Debt(models.Model):
     due_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True)
 
-
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -37,7 +34,10 @@ class Debt(models.Model):
         is_new = self.pk is None
         super().save(*args, **kwargs)
 
-        # Créer automatiquement un rappel
+        # Import here to avoid circular import
+        from .models import Rappel
+
+        # Créer automatiquement un rappel si dette nouvelle + date d'échéance
         if is_new and self.due_date:
             date_rappel = timezone.make_aware(
                 timezone.datetime.combine(
@@ -45,20 +45,11 @@ class Debt(models.Model):
                     timezone.datetime.min.time()
                 )
             )
-
             Rappel.objects.create(
                 debt=self,
                 date_rappel=date_rappel,
                 actif=True
             )
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.title} — {self.remaining_amount} restant"
-
-
 
     class Meta:
         ordering = ['-created_at']
@@ -82,10 +73,10 @@ class Debt(models.Model):
             return ((self.original_amount - self.remaining_amount) / self.original_amount) * 100
         return 0
     
-        
     @property
     def amount_paid(self):
         return self.original_amount - self.remaining_amount
+
 
 
 class Rappel(models.Model):
