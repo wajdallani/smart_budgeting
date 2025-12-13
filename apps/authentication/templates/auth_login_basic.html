@@ -1,3 +1,4 @@
+<!-- templates/auth_login_basic.html -->
 {% extends layout_path %}
 
 {% load static %}
@@ -7,31 +8,63 @@
 
 {% block page_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static  'vendor/css/pages/page-auth.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/css/pages/page-auth.css' %}">
+  <style>
+    /* Style personnalisé pour le message d'erreur de compte inactif */
+    .alert-error.account-inactive {
+      background-color: #ff4d4f;
+      border-color: #ff4d4f;
+      color: white;
+      font-weight: 500;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+    }
+    
+    .alert-error.account-inactive .alert-heading {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .alert-error i {
+      font-size: 20px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+  </style>
 {% endblock page_css %}
 
 {% block content %}
   <div class="container-xxl">
     <div class="authentication-wrapper authentication-basic container-p-y">
       <div class="authentication-inner">
-        <!-- Register -->
         <div class="card px-sm-6 px-0">
           <div class="card-body">
             <!-- Logo -->
-            <div class="app-brand justify-content-center">
+            <div class="app-brand justify-content-center mb-6">
               <a href="{% url 'index' %}" class="app-brand-link gap-2">
                 <span class="app-brand-logo demo">{% include 'partials/logo.html' %}</span>
                 <span class="app-brand-text demo text-heading fw-bold">{% get_theme_variables 'template_name' %}</span>
               </a>
             </div>
-            <!-- /Logo -->
-            <h4 class="mb-1">Welcome to {% get_theme_variables 'template_name' %}! 👋</h4>
-            <p class="mb-6">Please sign-in to your account and start the adventure</p>
+
+            <h4 class="mb-1">Bienvenue ! 👋</h4>
+            <p class="mb-6">Connectez-vous à votre compte</p>
 
             <!-- Messages -->
             {% if messages %}
               {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                <div class="alert alert-{{ message.tags }} {% if 'confirmé' in message|lower or 'inactif' in message|lower %}account-inactive{% endif %} alert-dismissible" role="alert">
+                  <strong>
+                    {% if message.tags == 'error' %}
+                      <i class="bx bx-error-circle"></i>
+                    {% elif message.tags == 'success' %}
+                      <i class="bx bx-check-circle"></i>
+                    {% elif message.tags == 'warning' %}
+                      <i class="bx bx-info-circle"></i>
+                    {% endif %}
+                  </strong>
                   {{ message }}
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -61,63 +94,51 @@
                 {% endif %}
               </div>
 
-              <!-- Password -->
+              <!-- Mot de passe -->
               <div class="mb-6 form-password-toggle">
-                <label class="form-label" for="id_password">Password</label>
+                <label class="form-label" for="id_password">Mot de passe</label>
                 <div class="input-group input-group-merge">
                   <input type="password" 
                          class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
                          id="id_password" 
                          name="password" 
                          placeholder="············"
-                         aria-describedby="password"
                          required>
-                 <span class="input-group-text cursor-pointer">
-  <i class="bx bx-hide"></i>
-</span>
-
+                  <span class="input-group-text cursor-pointer">
+                    <i class="icon-base bx bx-hide"></i>
+                  </span>
                 </div>
                 {% if form.password.errors %}
-                  <div class="text-danger mt-1">
+                  <div class="invalid-feedback d-block">
                     {% for error in form.password.errors %}
-                      <small>{{ error }}</small>
+                      {{ error }}
                     {% endfor %}
                   </div>
                 {% endif %}
               </div>
 
-              <!-- Remember me & Forgot password -->
-              <div class="mb-8">
-                <div class="d-flex justify-content-between">
-                  <div class="form-check mb-0">
-                    <input class="form-check-input" 
-                           type="checkbox" 
-                           id="id_remember_me" 
-                           name="remember_me">
-                    <label class="form-check-label" for="id_remember_me">
-                      Remember Me
-                    </label>
-                  </div>
-                  <a href="{% url 'auth-forgot-password-basic' %}">
-                    <span>Forgot Password?</span>
-                  </a>
+              <!-- Remember me -->
+              <div class="mb-6 d-flex justify-content-between align-items-center">
+                <div class="form-check mb-0">
+                  <input class="form-check-input" type="checkbox" id="id_remember_me" name="remember_me">
+                  <label class="form-check-label" for="id_remember_me">Se souvenir de moi</label>
                 </div>
+                <a href="{% url 'auth-forgot-password-basic' %}">
+                  <small>Mot de passe oublié ?</small>
+                </a>
               </div>
 
-              <div class="mb-6">
-                <button class="btn btn-primary d-grid w-100" type="submit">Login</button>
-              </div>
+              <button class="btn btn-primary d-grid w-100" type="submit">Connexion</button>
             </form>
 
             <p class="text-center">
-              <span>New on our platform?</span>
+              <span>Nouveau sur la plateforme ?</span>
               <a href="{% url 'auth-register-basic' %}">
-                <span>Create an account</span>
+                <span>Créer un compte</span>
               </a>
             </p>
           </div>
         </div>
-        <!-- /Register -->
       </div>
     </div>
   </div>
