@@ -1,10 +1,47 @@
 # apps/authentication/forms.py
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
 import re
 
 User = get_user_model()
+
+
+class CustomPasswordResetForm(PasswordResetForm):
+    """
+    Formulaire personnalisé qui vérifie si l'email existe
+    """
+    email = forms.EmailField(
+        max_length=254,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez votre email',
+            'id': 'email',
+            'autofocus': True
+        }),
+        label='Email'
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        
+        # Vérifier si l'utilisateur existe
+        if not User.objects.filter(email=email).exists():
+            raise ValidationError(
+                "Désolé, nous n'avons pas trouvé de compte associé à cette adresse email. "
+                "Veuillez vous inscrire d'abord."
+            )
+        
+        # Vérifier si l'utilisateur est actif
+        user = User.objects.get(email=email)
+        if not user.is_active:
+            raise ValidationError(
+                "Votre compte n'est pas encore activé. "
+                "Veuillez vous inscrire à nouveau pour recevoir un nouveau code de vérification."
+            )
+        
+        return email
 
 
 class RegisterForm(forms.ModelForm):
@@ -76,8 +113,25 @@ class RegisterForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise ValidationError('Cette adresse email est déjà utilisée.')
+        
+        # 🔹 Vérifier si un utilisateur avec cet email existe
+        existing_users = User.objects.filter(email=email)
+        
+        if existing_users.exists():
+            user = existing_users.first()
+            
+            # 🔹 Si le compte est INACTIF, on permet la réinscription
+            if not user.is_active:
+                # On va réutiliser ce compte au lieu d'en créer un nouveau
+                self.existing_inactive_user = user
+                return email
+            else:
+                # Si le compte est ACTIF, on refuse
+                raise ValidationError(
+                    'Cette adresse email est déjà utilisée par un compte actif. '
+                    'Veuillez vous connecter ou réinitialiser votre mot de passe.'
+                )
+        
         return email
 
     def clean(self):
@@ -91,13 +145,64 @@ class RegisterForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password'])
-        user.role = 'utilisateur'  # Par défaut
-        if commit:
-            user.save()
-        return user
+        # 🔹 Si un compte inactif existe, on le met à jour au lieu d'en créer un nouveau
+        if hasattr(self, 'existing_inactive_user'):
+            user = self.existing_inactive_user
+            user.firstname = self.cleaned_data['firstname']
+            user.lastname = self.cleaned_data['lastname']
+            user.set_password(self.cleaned_data['password'])
+            user.role = 'utilisateur'
+            user.is_active = False
+            user.is_email_verified = False
+            user.email_verification_code = None
+            user.verification_code_created_at = None
+            
+            if commit:
+                user.save()
+            
+            # Marquer qu'on a réutilisé un compte
+            self.reused_account = True
+            return user
+        else:
+            # 🔹 Créer un nouveau compte normalement
+            user = super().save(commit=False)
+            user.set_password(self.cleaned_data['password'])
+            user.role = 'utilisateur'
+            user.is_active = False
+            user.is_email_verified = False
+            
+            if commit:
+                user.save()
+            
+            self.reused_account = False
+            return user
 
+
+class VerificationCodeForm(forms.Form):
+    code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control text-center',
+            'placeholder': '000000',
+            'maxlength': '6',
+            'pattern': '[0-9]{6}',
+            'inputmode': 'numeric'
+        }),
+        label='Code de vérification'
+    )
+
+    def clean_code(self):
+        code = self.cleaned_data.get('code')
+        if not code.isdigit():
+            raise ValidationError("Le code doit contenir uniquement des chiffres.")
+        return code
+
+    def clean_code(self):
+        code = self.cleaned_data.get('code')
+        if not code.isdigit():
+            raise ValidationError("Le code doit contenir uniquement des chiffres.")
+        return code
 
 class LoginForm(forms.Form):
     email = forms.EmailField(

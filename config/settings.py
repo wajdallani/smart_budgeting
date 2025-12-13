@@ -6,6 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from .template import  THEME_LAYOUT_DIR, THEME_VARIABLES
+from decouple import config
 
 
 load_dotenv()  # take environment variables from .env.
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     "apps.dashboards",
     "apps.layouts",
     "apps.pages",
+    "apps.userApp",
     "apps.authentication",
     "apps.cards",
     "apps.ui",
@@ -62,7 +64,6 @@ INSTALLED_APPS = [
     "apps.revenueApp",
     "apps.detteApp",
     "apps.groupApp",
-    "apps.userApp",
     "apps.objectifsEpargnesApp",
     "apps.notificationApp",
 ]
@@ -180,11 +181,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 THEME_LAYOUT_DIR = THEME_LAYOUT_DIR
 THEME_VARIABLES = THEME_VARIABLES
 
-
+AUTH_USER_MODEL = 'userApp.User'
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-LOGIN_REDIRECT_URL = 'revenue_list'
+LOGIN_REDIRECT_URL = 'revenueApp:' \
+''
 LOGOUT_REDIRECT_URL = 'auth-login-basic'
 LOGIN_URL = 'auth-login-basic'
 

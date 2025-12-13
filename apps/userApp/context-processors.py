@@ -20,9 +20,8 @@ def menu_context(request):
                 f"{request.user.firstname} {request.user.lastname}".strip()
             )
         else:
-            # Si vous utilisez first_name/last_name (Django par défaut)
             context['user_full_name'] = (
-                f"{request.user.first_name} {request.user.last_name}".strip()
+                f"{request.user.firstname} {request.user.lastname}".strip()
             )
         
         # Si le nom est vide, utiliser l'email

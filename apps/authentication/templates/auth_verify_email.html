@@ -1,0 +1,121 @@
+<!-- templates/auth_verify_email.html -->
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Vérification Email - Pages{% endblock %}
+
+{% block page_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'vendor/css/pages/page-auth.css' %}">
+  <style>
+    .code-input {
+      font-size: 2rem;
+      letter-spacing: 1rem;
+      text-align: center;
+      font-weight: bold;
+    }
+    .resend-link {
+      cursor: pointer;
+      color: #696cff;
+      text-decoration: underline;
+    }
+    .resend-link:hover {
+      color: #5f61e6;
+    }
+  </style>
+{% endblock page_css %}
+
+{% block content %}
+  <div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+      <div class="authentication-inner">
+        <div class="card px-sm-6 px-0">
+          <div class="card-body">
+            <!-- Logo -->
+            <div class="app-brand justify-content-center mb-6">
+              <a href="{% url 'index' %}" class="app-brand-link gap-2">
+                <span class="app-brand-logo demo">{% include 'partials/logo.html' %}</span>
+                <span class="app-brand-text demo text-heading fw-bold">{% get_theme_variables 'template_name' %}</span>
+              </a>
+            </div>
+
+            <h4 class="mb-1">Vérification de l'email 📧</h4>
+            <p class="mb-6">
+              Un code de vérification à 6 chiffres a été envoyé à<br>
+              <strong>{{ user_email }}</strong>
+            </p>
+
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="post" class="mb-6">
+              {% csrf_token %}
+              
+              <div class="mb-6">
+                <label for="id_code" class="form-label">Code de vérification</label>
+                <input type="text" 
+                       class="form-control code-input {% if form.code.errors %}is-invalid{% endif %}" 
+                       id="id_code" 
+                       name="code" 
+                       placeholder="000000"
+                       maxlength="6"
+                       pattern="[0-9]{6}"
+                       inputmode="numeric"
+                       autofocus
+                       required>
+                {% if form.code.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.code.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                <small class="text-muted">Le code expire dans 10 minutes</small>
+              </div>
+
+              <button class="btn btn-primary d-grid w-100 mb-4" type="submit">
+                Vérifier
+              </button>
+
+              <div class="text-center">
+                <p class="mb-0">Vous n'avez pas reçu le code ?</p>
+                <form method="post" action="{% url 'resend-verification-code' %}" style="display: inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-link p-0 resend-link">
+                    Renvoyer le code
+                  </button>
+                </form>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block page_js %}
+  {{ block.super }}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const codeInput = document.getElementById('id_code');
+      
+      // Soumettre automatiquement quand 6 chiffres sont saisis
+      codeInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        if (this.value.length === 6) {
+          this.form.submit();
+        }
+      });
+    });
+  </script>
+{% endblock %}
