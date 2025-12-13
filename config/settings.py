@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "apps.dashboards",
     "apps.layouts",
     "apps.pages",
+    "apps.userApp",
     "apps.authentication",
     "apps.cards",
     "apps.ui",
@@ -72,8 +73,8 @@ INSTALLED_APPS = [
     "apps.revenueApp",
     "apps.detteApp",
     "apps.groupApp",
-    "apps.userApp",
     "apps.objectifsEpargnesApp",
+    "apps.notificationApp",
 ]
 
 MIDDLEWARE = [
@@ -103,6 +104,8 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.my_setting",
                 "config.context_processors.environment",
+                "apps.userApp.context_processors.menu_context",
+                "apps.notificationApp.context_processors.notifications_context",
             ],
             "libraries": {
                 "theme": "web_project.template_tags.theme",
@@ -166,6 +169,9 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 STATICFILES_DIRS = [
     BASE_DIR / "src" / "assets",
@@ -179,17 +185,27 @@ BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 # Template Settings
 # ------------------------------------------------------------------------------
 
 THEME_LAYOUT_DIR = THEME_LAYOUT_DIR
 THEME_VARIABLES = THEME_VARIABLES
 
-
+AUTH_USER_MODEL = 'userApp.User'
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = 'revenue_list'
 LOGOUT_REDIRECT_URL = 'auth-login-basic'
 LOGIN_URL = 'auth-login-basic'
+# Development email backend: print emails to console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# ---- Configuration Celery ----
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
