@@ -40,7 +40,19 @@
               <li class="px-2">
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
-                    <a href="{% url 'detteApp:debt_detail' n.debt_id %}" class="dropdown-item notification-item" data-rappel-id="{{ n.id }}">{{ n.message }}</a>
+                  {% comment %} <a href="{% url 'detteApp:debt_detail' n.debt_id %}" class="dropdown-item notification-item" data-rappel-id="{{ n.id }}">{{ n.message }}</a> {% endcomment %}
+                    {% if n.debt_id %}
+                      <a href="{% url 'detteApp:debt_detail' n.debt_id %}"
+                        class="dropdown-item notification-item"
+                        data-rappel-id="{{ n.id }}">
+                        {{ n.message }}
+                      </a>
+                    {% else %}
+                      <span class="dropdown-item text-muted">
+                        {{ n.message }}
+                      </span>
+                    {% endif %}
+                  
                     <small class="text-muted">{{ n.date_rappel }}</small>
                   </div>
                   <div>
