@@ -28,3 +28,4 @@ CELERY_BEAT_SCHEDULE = {
 # Apply beat schedule and timezone to the app configuration
 app.conf.beat_schedule = CELERY_BEAT_SCHEDULE
 app.conf.timezone = 'UTC'
+

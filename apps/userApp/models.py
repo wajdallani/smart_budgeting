@@ -38,12 +38,34 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class AppGroup(models.Model):
+#class AppGroup(models.Model):
     """
     Groupe métier (rien à voir avec les groupes de permissions Django)
     Attributs : id, name, created_at, nb_membre
     """
+#    name = models.CharField("Nom du groupe", max_length=150, unique=True)
+ #   created_at = models.DateTimeField("Date de création", auto_now_add=True)
+#    nb_membre = models.PositiveIntegerField("Nombre de membres", default=0)
+
+#    class Meta:
+ #       verbose_name = "Groupe"
+  #      verbose_name_plural = "Groupes"
+ #       ordering = ["name"]
+
+  ##  def __str__(self):
+    #    return self.name
+class AppGroup(models.Model):
+    """
+    Groupe métier (rien à voir avec les groupes de permissions Django)
+    """
     name = models.CharField("Nom du groupe", max_length=150, unique=True)
+    description = models.TextField("Description du groupe", blank=True)
+    created_by = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='owned_groups',
+        verbose_name="Créé par"
+    )
     created_at = models.DateTimeField("Date de création", auto_now_add=True)
     nb_membre = models.PositiveIntegerField("Nombre de membres", default=0)
 
