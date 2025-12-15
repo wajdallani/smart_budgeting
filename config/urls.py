@@ -25,6 +25,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    # Pages urls (Landing page - MUST BE FIRST)
+    path("", include("apps.pages.urls")),
+    
     # Dashboard urls
     path("", include("apps.dashboards.urls")),
 
@@ -72,6 +75,11 @@ urlpatterns = [
     # Objectifs Epargnes App urls
     path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
     path("notifications/", include("apps.notificationApp.urls")),
+    # AI App urls
+    path("ai/", include(("apps.aiApp.urls"), namespace="aiApp")),
+    # Chat App urls
+    path('chatApp/', include('apps.chatApp.urls')),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

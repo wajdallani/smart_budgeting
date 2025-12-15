@@ -76,6 +76,8 @@ INSTALLED_APPS = [
     "apps.groupApp",
     "apps.objectifsEpargnesApp",
     "apps.notificationApp",
+    "apps.aiApp",
+    "apps.chatApp",
 ]
 AUTH_USER_MODEL = 'userApp.User'
 
@@ -204,11 +206,3 @@ LOGIN_URL = 'auth-login-basic'
 # Development email backend: print emails to console
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-
-# ---- Configuration Celery ----
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'

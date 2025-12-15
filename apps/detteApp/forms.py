@@ -61,4 +61,6 @@ class RappelForm(forms.ModelForm):
                 'type': 'datetime-local',
                 'class': 'form-control'
             }),
+
+
         }

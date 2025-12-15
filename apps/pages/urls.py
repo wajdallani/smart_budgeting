@@ -1,10 +1,13 @@
 from django.urls import path
 from .views import PagesView
 from .views_misc import MiscPagesView
-
+from .views import PagesView, LandingView
 
 
 urlpatterns = [
+    path("", LandingView.as_view(), 
+        name="landing-home"
+    ),
     path(
         "pages/account_settings/account/",
         PagesView.as_view(template_name="pages_account_settings_account.html"),

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Budgeting - Gestion de Budget Intelligente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+        nav { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        nav .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: white; font-size: 1.5rem; font-weight: bold; }
+        .nav-menu { display: flex; gap: 30px; }
+        .nav-menu a { color: white; text-decoration: none; transition: opacity 0.3s; }
+        .nav-menu a:hover { opacity: 0.8; }
+        .nav-buttons { display: flex; gap: 15px; align-items: center; }
+        .nav-btn { padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; transition: all 0.3s; display: inline-block; border: none; cursor: pointer; font-size: 0.95rem; }
+        .nav-btn-login { background: transparent; color: white; border: 2px solid white; }
+        .nav-btn-login:hover { background: white; color: #667eea; }
+        .nav-btn-signup { background: white; color: #667eea; }
+        .nav-btn-signup:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 100px 20px; text-align: center; position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,30 Q300,60 600,30 T1200,30 L1200,120 L0,120 Z" fill="rgba(255,255,255,0.1)"/></svg>'); background-size: cover; opacity: 0.3; }
+        .hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; }
+        .hero p { font-size: 1.3rem; margin-bottom: 30px; opacity: 0.95; }
+        .cta-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 14px 35px; font-size: 1rem; border-radius: 50px; text-decoration: none; font-weight: bold; transition: all 0.3s; display: inline-block; border: none; cursor: pointer; }
+        .btn-primary { background: white; color: #667eea; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .btn-secondary { background: transparent; color: white; border: 2px solid white; }
+        .btn-secondary:hover { background: white; color: #667eea; }
+        .features { padding: 80px 20px; background: #f8f9fa; }
+        .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 50px; color: #333; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .feature-card { background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s; }
+        .feature-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .feature-icon { font-size: 3rem; margin-bottom: 15px; }
+        .feature-card h3 { font-size: 1.3rem; margin-bottom: 15px; color: #667eea; }
+        .feature-card p { color: #666; font-size: 0.95rem; }
+        .how-it-works { padding: 80px 20px; }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .step { text-align: center; }
+        .step-number { width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 20px; }
+        .step h3 { font-size: 1.2rem; margin-bottom: 10px; color: #333; }
+        .step p { color: #666; }
+        .stats { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 60px 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; text-align: center; }
+        .stat-item h2 { font-size: 2.5rem; margin-bottom: 10px; }
+        .stat-item p { font-size: 1rem; opacity: 0.95; }
+        .testimonials { padding: 80px 20px; background: #f8f9fa; }
+        .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .testimonial-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .stars { color: #ffc107; font-size: 1.1rem; margin-bottom: 15px; }
+        .testimonial-text { margin-bottom: 20px; color: #666; font-style: italic; }
+        .testimonial-author { display: flex; align-items: center; gap: 15px; }
+        .author-avatar { width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; }
+        .author-info h4 { margin: 0; color: #333; }
+        .author-info p { margin: 0; color: #999; font-size: 0.9rem; }
+        .pricing { padding: 80px 20px; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .pricing-card { background: white; padding: 40px 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; transition: all 0.3s; }
+        .pricing-card.featured { border: 2px solid #696cff; transform: scale(1.05); }
+        .pricing-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .price { font-size: 2.5rem; color: #696cff; margin: 20px 0; font-weight: bold; }
+        .price-period { color: #999; font-size: 0.9rem; }
+        .features-list { text-align: left; margin: 30px 0; }
+        .features-list li { padding: 10px 0; border-bottom: 1px solid #eee; color: #666; }
+        .faq { padding: 80px 20px; background: #f8f9fa; }
+        .faq-container { max-width: 700px; margin: 0 auto; }
+        .faq-item { background: white; margin-bottom: 20px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .faq-question { padding: 20px; background: #f8f9fa; cursor: pointer; font-weight: bold; color: #333; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .faq-question:hover { background: #e9ecef; }
+        .faq-answer { padding: 20px; color: #666; display: none; }
+        .faq-item.active .faq-answer { display: block; }
+        .cta { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center; }
+        .cta h2 { font-size: 2.5rem; margin-bottom: 20px; }
+        .cta p { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.95; }
+        footer { background: #1a1a1a; color: white; padding: 50px 20px; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 30px; }
+        .footer-column h4 { margin-bottom: 15px; color: #696cff; }
+        .footer-column a { display: block; color: #999; text-decoration: none; margin-bottom: 10px; transition: color 0.3s; }
+        .footer-column a:hover { color: #696cff; }
+        .footer-bottom { border-top: 1px solid #333; padding-top: 30px; text-align: center; color: #999; }
+        @media (max-width: 768px) { .hero h1 { font-size: 2rem; } .section-title { font-size: 1.8rem; } .cta-buttons { flex-direction: column; } .btn { width: 100%; } }
+    </style>
+</head>
+<body>
+    <nav><div class="container"><div class="logo">💰 Smart Budgeting</div><div class="nav-menu"><a href="#features">Fonctionnalités</a> <a href="#pricing">Tarifs</a> <a href="#faq">FAQ</a></div><div class="nav-buttons"><a href="/auth/login/" class="nav-btn nav-btn-login">Se connecter</a> <a href="/auth/register/" class="nav-btn nav-btn-signup">S'inscrire</a></div></div></nav>
+    <section class="hero"><div class="hero-content"><h1>🎯 Maîtrisez votre argent</h1><p>Smart Budgeting vous aide à contrôler vos dépenses, suivre vos revenus et atteindre vos objectifs financiers en toute simplicité.</p><div class="cta-buttons"><a href="/auth/register/" class="btn btn-primary">✨ Commencer Gratuitement</a> <a href="/auth/login/" class="btn btn-secondary">Connexion</a></div></div></section>
+    <section class="features" id="features"><div class="container"><h2 class="section-title">Nos Fonctionnalités</h2><div class="features-grid"><div class="feature-card"><div class="feature-icon">📊</div><h3>Suivi Automatique</h3><p>Synchronisez vos comptes bancaires et suivez toutes vos transactions en temps réel sans effort.</p></div><div class="feature-card"><div class="feature-icon">🎯</div><h3>Objectifs Intelligents</h3><p>Définissez vos objectifs d'épargne et recevez des recommandations pour les atteindre plus rapidement.</p></div><div class="feature-card"><div class="feature-icon">📈</div><h3>Rapports Détaillés</h3><p>Visualisez votre santé financière avec des graphiques clairs et des statistiques détaillées.</p></div><div class="feature-card"><div class="feature-icon">👥</div><h3>Partage en Groupe</h3><p>Partagez les dépenses avec votre famille ou vos amis de manière simple et transparente.</p></div><div class="feature-card"><div class="feature-icon">🔒</div><h3>Sécurité Maximale</h3><p>Vos données sont cryptées et protégées par les standards bancaires les plus élevés.</p></div><div class="feature-card"><div class="feature-icon">📱</div><h3>Multi-Plateforme</h3><p>Accédez à votre budget sur web, iOS et Android - synchronisé en temps réel partout.</p></div></div></div></section>
+    <section class="how-it-works"><div class="container"><h2 class="section-title">Comment Ça Marche</h2><div class="steps"><div class="step"><div class="step-number">1</div><h3>S'inscrire</h3><p>Créez votre compte gratuitement en 30 secondes - aucune carte bancaire requise.</p></div><div class="step"><div class="step-number">2</div><h3>Connecter vos comptes</h3><p>Synchronisez vos banques de manière sécurisée en un clic.</p></div><div class="step"><div class="step-number">3</div><h3>Définir vos objectifs</h3><p>Budget mensuel, épargne, projets... Fixez vos ambitions financières.</p></div><div class="step"><div class="step-number">4</div><h3>Suivre et optimiser</h3><p>Recevez des insights et atteignez vos objectifs financiers.</p></div></div></div></section>
+    <section class="stats"><div class="container"><div class="stats-grid"><div class="stat-item"><h2>50K+</h2><p>Utilisateurs actifs</p></div><div class="stat-item"><h2>€2M+</h2><p>Économies réalisées</p></div><div class="stat-item"><h2>4.9/5</h2><p>Note moyenne</p></div><div class="stat-item"><h2>180+</h2><p>Pays couverts</p></div></div></div></section>
+    <section class="testimonials"><div class="container"><h2 class="section-title">Témoignages</h2><div class="testimonials-grid"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"Smart Budgeting a complètement changé ma relation avec l'argent. J'ai économisé 3000€ en 6 mois!"</p><div class="testimonial-author"><div class="author-avatar"></div><div class="author-info"><h4>Marie Dubois</h4><p>Entrepreneure</p></div></div></div><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"Enfin une app aussi belle qu'efficace. L'interface est intuitive et les fonctionnalités sont parfaites!"</p><div class="testimonial-author"><div class="author-avatar"></div><div class="author-info"><h4>Thomas Martin</h4><p>Designer</p></div></div></div><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"Le suivi automatique me fait gagner du temps. Je recommande à tous mes amis!"</p><div class="testimonial-author"><div class="author-avatar"></div><div class="author-info"><h4>Sophie Laurent</h4><p>Professeure</p></div></div></div></div></div></section>
+    <section class="pricing" id="pricing"><div class="container"><h2 class="section-title">Nos Tarifs</h2><div class="pricing-grid"><div class="pricing-card"><h3>Gratuit</h3><div class="price">0€<span class="price-period">/mois</span></div><ul class="features-list"><li>✓ Suivi des dépenses</li><li>✓ Budgets simples</li><li>✓ Rapports mensuels</li><li>✓ Support communautaire</li></ul><a href="/auth/register/" class="btn btn-secondary">Commencer</a></div><div class="pricing-card featured"><h3>Premium</h3><div class="price">9.99€<span class="price-period">/mois</span></div><ul class="features-list"><li>✓ Tous les plans Gratuit</li><li>✓ Objectifs d'épargne avancés</li><li>✓ Synchronisation multi-comptes</li><li>✓ Partage en groupe illimité</li><li>✓ Support prioritaire</li></ul><a href="/auth/register/" class="btn btn-primary">Essayer Gratuitement</a></div><div class="pricing-card"><h3>Professionnel</h3><div class="price">24.99€<span class="price-period">/mois</span></div><ul class="features-list"><li>✓ Tous les plans Premium</li><li>✓ API d'intégration</li><li>✓ Analytics avancées</li><li>✓ Gestion multi-comptes</li><li>✓ Support dédié 24/7</li></ul><a href="/auth/register/" class="btn btn-secondary">Contacter</a></div></div></div></section>
+    <section class="faq" id="faq"><div class="container"><h2 class="section-title">Questions Fréquentes</h2><div class="faq-container"><div class="faq-item active"><div class="faq-question"><span>Smart Budgeting est-il gratuit?</span><span>▼</span></div><div class="faq-answer">Oui! Smart Budgeting offre un plan gratuit avec les fonctionnalités essentielles. Un plan Premium est également disponible pour accéder à des fonctionnalités avancées.</div></div><div class="faq-item"><div class="faq-question"><span>Mes données sont-elles sécurisées?</span><span>▼</span></div><div class="faq-answer">Absolument. Nous utilisons le chiffrement SSL, les standards bancaires et les dernières mesures de sécurité pour protéger vos données personnelles et financières.</div></div><div class="faq-item"><div class="faq-question"><span>Puis-je partager mon budget avec ma famille?</span><span>▼</span></div><div class="faq-answer">Oui! Vous pouvez créer des groupes et partager les dépenses avec votre famille, vos amis ou vos colocataires de manière simple et transparente.</div></div><div class="faq-item"><div class="faq-question"><span>Puis-je utiliser Smart Budgeting sur mobile?</span><span>▼</span></div><div class="faq-answer">Oui! Smart Budgeting fonctionne sur tous les appareils - ordinateur, tablette, iPhone et Android. Vos données sont synchronisées en temps réel partout.</div></div><div class="faq-item"><div class="faq-question"><span>Comment puis-je annuler mon abonnement?</span><span>▼</span></div><div class="faq-answer">Vous pouvez annuler votre abonnement à tout moment depuis vos paramètres. Aucune question posée, aucun frais de résiliation.</div></div></div></div></section>
+    <section class="cta"><div class="container"><h2>Prêt à prendre le contrôle de vos finances?</h2><p>Rejoignez plus de 50 000 utilisateurs qui ont déjà transformé leur vie financière</p><a href="/auth/register/" class="btn btn-primary">Commencer Maintenant - C'est Gratuit</a></div></section>
+    <footer><div class="container"><div class="footer-grid"><div class="footer-column"><h4>Smart Budgeting</h4><p>La solution complète pour gérer votre budget et atteindre vos objectifs financiers.</p></div><div class="footer-column"><h4>Produit</h4><a href="#features">Fonctionnalités</a> <a href="#pricing">Tarifs</a> <a href="#">Sécurité</a> <a href="#">Application Mobile</a></div><div class="footer-column"><h4>Entreprise</h4><a href="#">À propos</a> <a href="#">Blog</a> <a href="#">Carrières</a> <a href="#">Presse</a></div><div class="footer-column"><h4>Support</h4><a href="#">Centre d'aide</a> <a href="#">Contact</a> <a href="#">Confidentialité</a> <a href="#">CGU</a></div></div><div class="footer-bottom"><p>&copy; 2024 Smart Budgeting. Tous droits réservés.</p></div></div></footer>
+    <script>document.querySelectorAll('.faq-question').forEach(q => q.addEventListener('click', function() { this.parentElement.classList.toggle('active'); }));</script>
+</body>
+</html>

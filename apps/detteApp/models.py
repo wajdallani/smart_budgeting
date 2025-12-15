@@ -3,16 +3,18 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.conf import settings  # IMPORTANT : utiliser le custom user model
-# Create your models here.
 
+from datetime import timedelta
+
+
+# Create your models here.
 class Debt(models.Model):
-    title = models.CharField(max_length=200)  # ex: "Prêt à Paul"
+    title = models.CharField(max_length=200)
     creditor = models.CharField(max_length=150, blank=True)
     debtor = models.CharField(max_length=150, blank=True)
-    
-    # Utilise automatiquement le User du projet
+
     utilisateur = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="dettes",
         null=True,
@@ -21,12 +23,33 @@ class Debt(models.Model):
 
     original_amount = models.DecimalField(max_digits=12, decimal_places=2)
     remaining_amount = models.DecimalField(max_digits=12, decimal_places=2)
-    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)   
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        # Import here to avoid circular import
+        from .models import Rappel
+
+        # Créer automatiquement un rappel si dette nouvelle + date d'échéance
+        if is_new and self.due_date:
+            date_rappel = timezone.make_aware(
+                timezone.datetime.combine(
+                    self.due_date - timedelta(days=1),
+                    timezone.datetime.min.time()
+                )
+            )
+            Rappel.objects.create(
+                debt=self,
+                date_rappel=date_rappel,
+                actif=True
+            )
 
     class Meta:
         ordering = ['-created_at']
@@ -49,10 +72,11 @@ class Debt(models.Model):
         if self.original_amount:
             return ((self.original_amount - self.remaining_amount) / self.original_amount) * 100
         return 0
-        
+    
     @property
     def amount_paid(self):
         return self.original_amount - self.remaining_amount
+
 
 
 class Rappel(models.Model):
@@ -74,6 +98,7 @@ class Rappel(models.Model):
                 return f"Rappel: {self.debt.title} — Il reste {days_left} jours avant l'échéance"
         return f"Rappel pour {self.debt}"
 
+
 class Payment(models.Model):
     debt = models.ForeignKey(Debt, related_name='payments', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -87,4 +112,3 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"{self.amount} on {self.date}"
-    
