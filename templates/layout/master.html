@@ -1,11 +1,10 @@
 {% load static %}
 
 <!DOCTYPE html>
-
 <html lang="en" class="layout-menu-fixed {{navbar_type_class}} {{header_type_class}} {{menu_collapsed_class}} {{footer_fixed_class}} {{display_customizer_class}} {{content_layout_class}}" dir="{{text_direction_value}}" data-skin="{{skins}}" data-bs-theme="{{theme}}" data-assets-path="{% static '/' %}" data-base-url="{{url}}" data-framework="django" data-template="{{ menu_horizontal|yesno:'horizontal,vertical' }}-menu-{{ is_front|yesno:'front,' }}-{{ skins }}-{{ theme}}">
 
-
 <head>
+  <meta name="csrf-token" content="{{ csrf_token }}">
   <title>{% block title %}{% endblock title %} | {% get_theme_variables 'template_name' %} - {% get_theme_variables 'template_suffix' %}</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
@@ -36,10 +35,8 @@
   <!--Page CSS-->
   {% block page_css %}{% endblock page_css %}
 
-
-  <!-- Include the scripts partial (required ) -->
+  <!-- Include the scripts partial (required) -->
   {% include is_front|yesno:"./partials/scripts_includes_front.html,./partials/scripts_includes.html" %}
-
 </head>
 
 <body>
@@ -50,12 +47,80 @@
 
   {% include is_front|yesno:"./partials/scripts_front.html,./partials/scripts.html" %}
 
-  <!--Vendors Javascript-->
-  {% block vendor_js %} {% endblock vendor_js %}
+  <!-- Vendors Javascript -->
+  {% block vendor_js %}{% endblock vendor_js %}
 
-  <!--Page Javascript-->
-  {% block page_js %} {% endblock page_js %}
+  <!-- Page Javascript -->
+  {% block page_js %}{% endblock page_js %}
+
+  <!-- AI Chat Widget (US 9.1: Recommandations par rapport aux dépenses) -->
+  <!-- Chat Button -->
+  <button id="openChat" style="position:fixed;bottom:20px;right:20px;z-index:1000;background:#696cff;color:white;border:none;border-radius:50%;width:60px;height:60px;cursor:pointer;font-size:24px;">💬</button>
+
+  <!-- Chat Window -->
+  <div id="chatWindow" style="display:none;position:fixed;bottom:90px;right:20px;width:350px;height:500px;background:white;border:1px solid #ccc;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000;overflow:hidden;">
+    <div id="chatHeader" style="background:#696cff;color:white;padding:12px;font-weight:bold;">Smart Coach 💡</div>
+    <div id="chatMessages" style="padding:12px;height:380px;overflow-y:auto;"></div>
+    <div style="padding:10px;border-top:1px solid #eee;display:flex;">
+      <input type="text" id="userInput" placeholder="Posez une question..." style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;">
+      <button id="sendBtn" style="margin-left:8px;background:#696cff;color:white;border:none;border-radius:4px;padding:8px 12px;cursor:pointer;">Envoyer</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('openChat').onclick = () => {
+      const win = document.getElementById('chatWindow');
+      win.style.display = win.style.display === 'none' ? 'block' : 'none';
+    };
+
+    document.getElementById('sendBtn').onclick = sendMessage;
+    document.getElementById('userInput').onkeypress = (e) => {
+      if (e.key === 'Enter') sendMessage();
+    };
+
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage('Vous', message);
+      input.value = '';
+      document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+      fetch('/chatApp/chat/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ message: message })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.response) {
+          addMessage('Smart Coach', data.response);
+        } else {
+          addMessage('Smart Coach', '⚠️ ' + (data.error || 'Erreur inconnue.'));
+        }
+        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+      })
+      .catch(err => {
+        addMessage('Smart Coach', '⚠️ Erreur de connexion à l’assistant.');
+      });
+    }
+
+    function addMessage(sender, text) {
+      const messages = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.innerHTML = `<strong>${sender}:</strong> ${text.replace(/\n/g, '<br>')}`;
+      div.style.marginBottom = '10px';
+      messages.appendChild(div);
+    }
+  </script>
 
 </body>
-
 </html>
+
+

@@ -1,11 +1,24 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from decimal import Decimal
-
+from django.conf import settings
+from apps.categorieApp.models import Categorie  # adjust import path if needed
 
 class Depense(models.Model):
     """Modèle pour gérer les dépenses"""
-    
+    user = models.ForeignKey(  # ✅ add this
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="depenses"
+    )
+    categorie = models.ForeignKey(
+        Categorie,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="depenses",
+        verbose_name="Catégorie"
+    )
     depense_id = models.AutoField(
         primary_key=True,
         verbose_name="ID Dépense"

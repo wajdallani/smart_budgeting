@@ -18,7 +18,9 @@ from .models import Depense
 from .forms import DepenseForm
 from .utils import extract_invoice_data_from_file
 from web_project import TemplateLayout
+from django.contrib.auth.mixins import LoginRequiredMixin
 
+from django.shortcuts import redirect
 
 
 
@@ -95,7 +97,7 @@ class DepenseDetailView(DetailView):
         return TemplateLayout.init(self, super().get_context_data(**kwargs))
 
 
-class DepenseCreateView(CreateView):
+class DepenseCreateView(LoginRequiredMixin, CreateView):
     model = Depense
     form_class = DepenseForm
     template_name = 'depenseApp/depense_form.html'
@@ -112,9 +114,9 @@ class DepenseCreateView(CreateView):
     def form_valid(self, form):
         self.object = form.save(commit=False)
 
-        if hasattr(self.object, "user") and self.request.user.is_authenticated:
-            self.object.user = self.request.user
-
+        # if hasattr(self.object, "user") and self.request.user.is_authenticated:
+        #     self.object.user = self.request.user
+        self.object.user = self.request.user
         if not self.object.amount:
             form.add_error("amount", "Montant obligatoire.")
         if not self.object.date:
@@ -126,7 +128,13 @@ class DepenseCreateView(CreateView):
         self.object.save()
         form.save_m2m()
         messages.success(self.request, "Dépense créée avec succès.")
-        return super().form_valid(form)
+        # return super().form_valid(form)
+        return redirect(self.get_success_url())
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
 
 class DepenseUpdateView(UpdateView):
     model = Depense
@@ -136,6 +144,10 @@ class DepenseUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         return TemplateLayout.init(self, super().get_context_data(**kwargs))
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
 
 class DepenseDeleteView(DeleteView):
@@ -163,3 +175,4 @@ def depense_ocr_api(request):
     # data = { "amount": "...", "date": "YYYY-MM-DD" }
 
     return JsonResponse(data)
+

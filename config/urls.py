@@ -75,6 +75,9 @@ urlpatterns = [
     # Objectifs Epargnes App urls
     path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
     path("notifications/", include("apps.notificationApp.urls")),
+    path('chatApp/', include('apps.chatApp.urls')),
+     # AI App urls
+    path("ai/", include(("apps.aiApp.urls"), namespace="aiApp")),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
@@ -83,3 +86,6 @@ if settings.DEBUG:
 handler404 = SystemView.as_view(template_name="pages_misc_error.html", status=404)
 handler400 = SystemView.as_view(template_name="pages_misc_error.html", status=400)
 handler500 = SystemView.as_view(template_name="pages_misc_error.html", status=500)
+
+
+

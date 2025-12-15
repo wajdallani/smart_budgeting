@@ -66,6 +66,10 @@ INSTALLED_APPS = [
     "apps.groupApp",
     "apps.objectifsEpargnesApp",
     "apps.notificationApp",
+    "apps.chatApp",
+    "apps.aiApp",
+
+
 ]
 AUTH_USER_MODEL = 'userApp.User'
 
@@ -94,6 +98,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "config.context_processors.my_setting",
+                "config.context_processors.environment",
                 "apps.userApp.context_processors.menu_context",
                 "apps.notificationApp.context_processors.notifications_context",
             ],
@@ -190,13 +196,4 @@ LOGIN_REDIRECT_URL = 'revenueApp:' \
 LOGOUT_REDIRECT_URL = 'auth-login-basic'
 LOGIN_URL = 'auth-login-basic'
 
-
-# Development email backend: print emails to console
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-
-
-
-TIME_ZONE = 'Africa/Algiers'   # or your real timezone
-USE_TZ = True
 

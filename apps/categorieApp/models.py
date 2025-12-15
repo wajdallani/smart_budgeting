@@ -26,7 +26,9 @@ class Categorie(models.Model):
     def __str__(self):
         if self.est_globale:
             return f"{self.nom} (Globale)"
-        return f"{self.nom} ({self.utilisateur.username if self.utilisateur else 'Sans utilisateur'})"
+        display = getattr(self.utilisateur, "username", None) or getattr(self.utilisateur, "email", None) or str(self.utilisateur)
+
+        return f"{self.nom} ({display})"
 
     def peut_etre_modifiee_par(self, user):
         """Vérifie si l'utilisateur peut modifier cette catégorie"""
@@ -39,3 +41,4 @@ class Categorie(models.Model):
         if user.is_staff and self.est_globale:
             return True
         return self.utilisateur == user and not self.est_globale
+
