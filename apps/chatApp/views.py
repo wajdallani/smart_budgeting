@@ -1,60 +1,142 @@
-# Create your views here.
 import json
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.models import AnonymousUser
+from django.db.models import Sum
 from groq import Groq
 from decouple import config
 
-# @login_required
+from apps.depenseApp.models import Depense
+from apps.revenueApp.models import Revenue
+from apps.objectifsEpargnesApp.models import ObjEpargne
+
+def detect_intent(message: str) -> str:
+    msg = message.lower()
+
+    if any(w in msg for w in ["dépense", "dépenser", "achat", "payer"]):
+        return "DEPENSE"
+
+    if any(w in msg for w in ["objectif", "épargne", "économiser", "save"]):
+        return "EPARGNE"
+
+    if any(w in msg for w in ["revenu", "salaire", "gain"]):
+        return "REVENU"
+
+    return "GLOBAL"
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def ai_chat(request):
-    if request.method == 'GET':
+
+    if request.method == "GET":
         return JsonResponse({
             "status": "OK",
-            "message": "AI Chat is ready. Send POST with {\"message\": \"...\"}"
+            "message": "AI Chat ready"
         })
 
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body or "{}")
         user_query = data.get("message", "").strip()
 
         if not user_query:
             return JsonResponse({"error": "Message vide"}, status=400)
 
-        # 👤 Optional user name
-        mock_user_firstname = getattr(request.user, 'first_name', 'Utilisateur')
+        intent = detect_intent(user_query)
 
-        # 🧠 Build prompt for free conversation
-        prompt = f"""
-Tu es Smart Coach, un assistant financier et éducatif intelligent.
-Réponds en français, de façon claire, concise et utile (2–3 phrases max).
-Tu peux discuter de finance personnelle, finance globale, économie, investissement, ou toute question liée à l'argent.
+        is_authenticated = (
+            hasattr(request, "user")
+            and request.user.is_authenticated
+            and not isinstance(request.user, AnonymousUser)
+        )
 
-Question de l'utilisateur : "{user_query}"
-        """.strip()
+        # =====================
+        # USER CONNECTÉ
+        # =====================
+        if is_authenticated:
+            user = request.user
+            firstname = user.firstname or "Utilisateur"
 
-        # 🚀 Call Groq LLM
-        try:
-            client = Groq(api_key=config('GROQ_API_KEY'))
-            chat_completion = client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": "Tu es un coach financier utile et clair, capable de parler de tout."},
-                    {"role": "user", "content": prompt}
-                ],
-                model="llama-3.1-8b-instant",
-                temperature=0.7,
-                max_tokens=200
-            )
-            response_text = chat_completion.choices[0].message.content.strip()
+            depenses = Depense.objects.filter(user=user)
+            revenus = Revenue.objects.filter(user=user)
+            objectifs = ObjEpargne.objects.filter(user=user)
 
-        except Exception:
-            # Fallback if Groq fails
-            response_text = f"Bonjour {mock_user_firstname} ! Je suis Smart Coach. Pose-moi une question sur la finance ou l'économie, et je ferai de mon mieux pour y répondre."
+            total_depenses = depenses.aggregate(
+                total=Sum("amount")
+            )["total"] or 0
 
-        return JsonResponse({"response": response_text})
+            total_revenus = revenus.aggregate(
+                total=Sum("amount")
+            )["total"] or 0
+
+            objectifs_info = [
+                f"{o.name}: {o.total_contributed}/{o.target_amount} DT ({o.progress_percentage}%)"
+                for o in objectifs
+            ] or ["Aucun objectif d’épargne"]
+
+            # 🎯 CONTEXTE SELON L’INTENTION
+            if intent == "DEPENSE":
+                context = f"Dépenses totales : {total_depenses} DT"
+            elif intent == "REVENU":
+                context = f"Revenus totaux : {total_revenus} DT"
+            elif intent == "EPARGNE":
+                context = " | ".join(objectifs_info)
+            else:
+                context = (
+                    f"Revenus : {total_revenus} DT\n"
+                    f"Dépenses : {total_depenses} DT\n"
+                    f"Objectifs : {', '.join(objectifs_info)}"
+                )
+
+            prompt = f"""
+Tu es Smart Coach, un assistant financier personnel intelligent.
+
+Utilisateur : {firstname}
+Contexte financier :
+{context}
+
+Question :
+"{user_query}"
+
+Règles :
+- Réponds en français
+- 2 à 3 phrases max
+- Donne un conseil concret si possible
+- Ton motivant, humain et professionnel
+            """.strip()
+
+        # =====================
+        # USER NON CONNECTÉ
+        # =====================
+        else:
+            prompt = f"""
+Tu es Smart Coach, l’assistant de Smart Budgeting.
+Explique la finance personnelle ou présente l'application.
+Réponse simple et pédagogique.
+
+Question :
+"{user_query}"
+            """.strip()
+
+        # =====================
+        # APPEL LLM
+        # =====================
+        client = Groq(api_key=config("GROQ_API_KEY"))
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "Tu es un excellent coach financier."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.7,
+            max_tokens=200,
+        )
+
+        return JsonResponse({
+            "response": completion.choices[0].message.content.strip()
+        })
 
     except Exception as e:
-        return JsonResponse({"error": "Erreur interne : " + str(e)}, status=500)
+        return JsonResponse(
+            {"error": "Erreur interne : " + str(e)},
+            status=500
+        )
