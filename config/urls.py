@@ -20,11 +20,14 @@ from django.urls import include, path
 from web_project.views import SystemView
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    # Pages urls (Landing page - MUST BE FIRST)
+    path("", include("apps.pages.urls")),
+    
     # Dashboard urls
     path("", include("apps.dashboards.urls")),
 
@@ -59,10 +62,7 @@ urlpatterns = [
     # Tables urls
     path("", include("apps.tables.urls")),
     # Group App urls
-
     path("group/", include("apps.groupApp.urls")),
-
- 
 
     # Categorie App urls
     path("categorie/", include("apps.categorieApp.urls")),
@@ -75,6 +75,11 @@ urlpatterns = [
     # Objectifs Epargnes App urls
     path("objectifs_epargne/", include("apps.objectifsEpargnesApp.urls")),
     path("notifications/", include("apps.notificationApp.urls")),
+    # AI App urls
+    path("ai/", include(("apps.aiApp.urls"), namespace="aiApp")),
+    # Chat App urls
+    path('chatApp/', include('apps.chatApp.urls')),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

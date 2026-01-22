@@ -1,5 +1,3 @@
-
-
 # Create your views here.
 # gestion_dettes/views.py
 from django.shortcuts import get_object_or_404, redirect, render

@@ -10,7 +10,7 @@ from .models import Debt, Rappel
 def create_rappel_for_due_date(sender, instance: Debt, created, **kwargs):
     """Create a Rappel when a Debt with a due_date is saved and no rappel exists.
 
-    - If `due_date` is set, and there is no Rappel for this debt with the same
+    - If due_date is set, and there is no Rappel for this debt with the same
       date, create one (actif=True, envoye=False).
     - Reminder is created immediately so it appears in notifications right away.
     - This avoids duplicating reminders when editing a debt multiple times.
@@ -25,7 +25,7 @@ def create_rappel_for_due_date(sender, instance: Debt, created, **kwargs):
         return
 
     # Create reminder immediately (now) so it appears in notifications right away
-    # The __str__ method will calculate remaining days dynamically
+    # The _str_ method will calculate remaining days dynamically
     rappel_dt = maintenant
 
     Rappel.objects.create(debt=instance, date_rappel=rappel_dt, actif=True, envoye=False)

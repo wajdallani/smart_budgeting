@@ -1,6 +1,3 @@
-# userApp/context_processors.py
-
-
 from django.db.models import Q
 from django.utils import timezone
 
@@ -61,6 +58,4 @@ def menu_context(request):
             context['notifications_count'] = context.get('notifications_count', 0)
             context['notifications'] = []
     
-
     return context
-
