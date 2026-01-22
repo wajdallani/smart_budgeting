@@ -1,0 +1,64 @@
+{% extends layout_path %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Ajouter une contribution{% endblock %}
+
+{% block content %}
+
+<div class="col-xl mx-auto" style="max-width: 720px;">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <i class="bx bx-plus-circle"></i> Ajouter une contribution
+      </h5>
+      <small class="text-body">Objectif: {{ objectif.name }}</small>
+    </div>
+
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+
+        {% if form.errors %}
+          <div class="alert alert-danger">
+            Veuillez corriger les erreurs ci-dessous.
+          </div>
+        {% endif %}
+
+        <div class="mb-4">
+          <label class="form-label" for="id_amount">Montant</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text"><i class="bx bx-money"></i></span>
+            {{ form.amount }}
+            <span class="input-group-text">TND</span>
+          </div>
+          {% if form.amount.errors %}
+            <small class="text-danger">{{ form.amount.errors|striptags }}</small>
+          {% endif %}
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label" for="id_added_at">Date d’ajout</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text"><i class="bx bx-calendar"></i></span>
+            {{ form.added_at }}
+          </div>
+          {% if form.added_at.errors %}
+            <small class="text-danger">{{ form.added_at.errors|striptags }}</small>
+          {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'detailEpargne' objectif.pk %}" class="btn btn-secondary">
+            Annuler
+          </a>
+          <button type="submit" class="btn btn-success">
+            <i class="bx bx-check"></i> Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

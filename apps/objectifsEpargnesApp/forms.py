@@ -24,7 +24,6 @@ class ObjEpargneForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
 class ObjEpargneContributionForm(forms.ModelForm):
-    # Let user choose the datetime (you asked for this)
     added_at = forms.DateTimeField(
         required=True,
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'})
@@ -32,9 +31,10 @@ class ObjEpargneContributionForm(forms.ModelForm):
 
     class Meta:
         model = ObjEpargneContribution
-        # Usually we set goal in the view (from URL) so we don’t expose it here
         fields = ['amount', 'added_at']
-        labels = {
-            'amount': 'Montant',
-            'added_at': 'Ajouté le',
-        }
+        labels = {'amount': 'Montant', 'added_at': 'Ajouté le'}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['amount'].widget.attrs.update({'class': 'form-control'})
+        self.fields['added_at'].widget.attrs.update({'class': 'form-control'})

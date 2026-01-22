@@ -8,7 +8,13 @@ Here you can override the page view layout.
 Refer to pages/urls.py file for more pages.
 """
 
-
+class LandingView(TemplateView):
+    """Vue simple pour la page d'accueil"""
+    template_name = "landing_page.html"
+    
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
+    
 class PagesView(TemplateView):
     # Predefined function
     def get_context_data(self, **kwargs):

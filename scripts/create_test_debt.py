@@ -24,6 +24,4 @@ try:
     print('Debt saved, pk=', d.pk)
     print('Rappels for this debt:', Rappel.objects.filter(debt=d).count())
 except Exception:
-
     traceback.print_exc()
-
